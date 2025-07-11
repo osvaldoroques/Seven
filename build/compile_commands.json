@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++  -I/workspaces/Seven/build -O3 -DNDEBUG -fPIC -std=gnu++17 -o CMakeFiles/proto_files.dir/messages.pb.cc.o -c /workspaces/Seven/build/messages.pb.cc",
+  "file": "/workspaces/Seven/build/messages.pb.cc"
+},
+{
+  "directory": "/workspaces/Seven/build/libs/common",
+  "command": "/usr/bin/c++  -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -O3 -DNDEBUG -fPIC -std=gnu++17 -o CMakeFiles/common.dir/service_host_impl.cpp.o -c /workspaces/Seven/libs/common/service_host_impl.cpp",
+  "file": "/workspaces/Seven/libs/common/service_host_impl.cpp"
+},
+{
+  "directory": "/workspaces/Seven/build/services/portfolio_manager",
+  "command": "/usr/bin/c++  -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -O3 -DNDEBUG -fPIE -std=gnu++17 -o CMakeFiles/portfolio_manager.dir/main.cpp.o -c /workspaces/Seven/services/portfolio_manager/main.cpp",
+  "file": "/workspaces/Seven/services/portfolio_manager/main.cpp"
+}
+]

@@ -1,0 +1,34 @@
+# Test Dockerfile to validate OpenSSL installation
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    cmake \
+    build-essential \
+    libssl-dev \
+    zlib1g-dev \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Test OpenSSL availability
+RUN echo "Testing OpenSSL..." && \
+    pkg-config --modversion openssl && \
+    find /usr -name "openssl" -type d 2>/dev/null | head -5 && \
+    find /usr -name "*ssl*.so" 2>/dev/null | head -5
+
+# Try to build NATS with minimal output
+RUN cd /tmp && \
+    wget -q https://github.com/nats-io/nats.c/archive/refs/tags/v3.7.0.tar.gz && \
+    tar -xzf v3.7.0.tar.gz && \
+    cd nats.c-3.7.0 && \
+    echo "=== Starting CMake configuration ===" && \
+    mkdir build && cd build && \
+    cmake .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DNATS_BUILD_EXAMPLES=OFF \
+        -DNATS_BUILD_STREAMING=OFF \
+        -DCMAKE_VERBOSE_MAKEFILE=ON && \
+    echo "=== CMake completed, starting build ===" && \
+    make -j2 && \
+    echo "=== Build completed successfully ==="
+
+CMD ["echo", "NATS build test completed"]

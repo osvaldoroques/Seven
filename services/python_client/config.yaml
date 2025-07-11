@@ -1,0 +1,12 @@
+# Configuration for Python client
+nats:
+  url: "nats://nats:4222"
+  timeout: 5000
+
+client:
+  name: "python-client-001"
+  request_timeout: 10000  # milliseconds
+
+logging:
+  level: "info"
+  format: "simple"

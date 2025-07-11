@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG CMakeFiles/portfolio_manager.dir/main.cpp.o -o portfolio_manager  ../../libs/common/libcommon.a ../../libproto_files.a /usr/lib/x86_64-linux-gnu/libprotobuf.so -lnats /usr/lib/x86_64-linux-gnu/libprotobuf.so 

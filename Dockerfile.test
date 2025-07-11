@@ -1,0 +1,23 @@
+# Simple test Dockerfile to debug package installation
+FROM ubuntu:22.04
+
+# Install basic tools first
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Test protobuf packages
+RUN apt-get update && \
+    echo "=== Searching for protobuf packages ===" && \
+    apt-cache search protobuf | grep -E "lib.*protobuf" && \
+    echo "=== Searching for yaml packages ===" && \
+    apt-cache search yaml-cpp && \
+    echo "=== Testing installation ===" && \
+    apt-get install -y \
+        libprotobuf-dev \
+        libyaml-cpp-dev \
+    && echo "✅ Packages installed successfully" \
+    && rm -rf /var/lib/apt/lists/*
+
+CMD ["echo", "Test completed successfully"]

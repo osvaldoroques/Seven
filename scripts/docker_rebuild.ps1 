@@ -1,0 +1,8 @@
+Write-Host "🐳 Stopping and removing previous containers..."
+docker-compose down
+
+Write-Host "🐳 Building Docker images with docker-compose (no cache)..."
+docker-compose build --no-cache
+
+Write-Host "🐳 Starting containers with docker-compose..."
+docker-compose up

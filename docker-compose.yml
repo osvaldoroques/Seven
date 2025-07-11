@@ -1,0 +1,38 @@
+
+services:
+  nats:
+    image: nats:latest
+    container_name: seven-nats-server
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-js"]
+    healthcheck:
+      test: ["CMD", "/nats-server", "--help"]
+      interval: 2s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  cpp_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: portfolio_manager
+    container_name: seven-portfolio-manager
+    depends_on:
+      nats:
+        condition: service_healthy
+    environment:
+      - NATS_URL=nats://nats:4222
+
+  python_client:
+    build:
+      context: .
+      dockerfile: services/python_client/Dockerfile
+    container_name: seven-healthcheck-client
+    depends_on:
+      nats:
+        condition: service_healthy
+    environment:
+      - NATS_URL=nats://nats:4222

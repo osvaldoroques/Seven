@@ -1,0 +1,66 @@
+# Alternative Dockerfile - Static linking approach
+FROM ubuntu:22.04 AS base
+
+# Install dependencies (without NATS for now)
+RUN apt-get update && apt-get install -y \
+    cmake \
+    ninja-build \
+    g++ \
+    pkg-config \
+    protobuf-compiler \
+    libprotobuf-dev \
+    libyaml-cpp-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy source code
+COPY libs/ libs/
+COPY proto/ proto/
+COPY services/ services/
+COPY tests/ tests/
+COPY CMakeLists.txt .
+COPY config.yaml .
+
+# Generate protobuf files
+RUN cd proto && chmod +x generate_proto.sh && ./generate_proto.sh
+
+# Build stage (will need to handle NATS differently)
+FROM base AS builder
+
+# Create a stub NATS implementation for testing
+RUN mkdir -p /usr/local/include/nats && \
+    echo '// Stub NATS header for Docker build' > /usr/local/include/nats/nats.h && \
+    echo 'typedef int natsConnection;' >> /usr/local/include/nats/nats.h && \
+    echo 'typedef int jsCtx;' >> /usr/local/include/nats/nats.h && \
+    echo 'typedef int natsStatus;' >> /usr/local/include/nats/nats.h && \
+    echo '#define NATS_OK 0' >> /usr/local/include/nats/nats.h
+
+# Try to build without NATS first
+RUN mkdir build && cd build && \
+    cmake -GNinja .. -DSKIP_NATS=ON && \
+    ninja || echo "Build failed - expected without NATS"
+
+# Runtime stage for portfolio_manager  
+FROM ubuntu:22.04 AS portfolio_manager
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libstdc++6 \
+    libprotobuf-dev \
+    libyaml-cpp-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# For now, just copy a placeholder
+RUN echo '#!/bin/bash' > portfolio_manager && \
+    echo 'echo "Portfolio Manager stub - NATS integration pending"' >> portfolio_manager && \
+    echo 'sleep infinity' >> portfolio_manager && \
+    chmod +x portfolio_manager
+
+COPY --from=builder /app/config.yaml .
+
+EXPOSE 8080
+CMD ["./portfolio_manager", "config.yaml"]

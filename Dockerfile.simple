@@ -1,0 +1,13 @@
+# Quick test for package availability
+FROM ubuntu:22.04
+
+RUN apt-get update && \
+    echo "Testing package installation..." && \
+    apt-get install -y \
+        libprotobuf-dev \
+        libyaml-cpp-dev \
+    && echo "✅ Packages installed successfully" \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+CMD ["echo", "Package test completed"]

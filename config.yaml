@@ -1,0 +1,37 @@
+# Configuration for Seven microservices
+nats:
+  url: "nats://localhost:4222"
+  timeout: 5000
+  max_reconnect: 10
+  subjects:
+    portfolio_requests: "portfolio.requests"
+    portfolio_updates: "portfolio.updates"
+
+logging:
+  level: "info"  # debug, info, warn, error
+  format: "structured"  # structured, simple
+  file: ""  # empty for stdout
+
+portfolio_manager:
+  port: 8080
+  max_positions: 1000
+  update_frequency: 1000  # milliseconds
+  default_portfolio_value: 100000.0
+  risk_limits:
+    max_position_size: 10000.0
+    max_daily_loss: 5000.0
+  supported_exchanges:
+    - "NYSE"
+    - "NASDAQ"
+    - "CME"
+
+thread_pool:
+  size: 4  # number of worker threads
+
+shutdown:
+  timeout: 5000  # milliseconds to wait for graceful shutdown
+  force_after_timeout: true  # force shutdown after timeout
+
+monitoring:
+  enabled: true
+  metrics_port: 9090

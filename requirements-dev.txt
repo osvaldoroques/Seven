@@ -1,0 +1,4 @@
+nats-py
+protobuf
+grpcio
+grpcio-tools

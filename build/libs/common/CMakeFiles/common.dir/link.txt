@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcommon.a CMakeFiles/common.dir/service_host_impl.cpp.o
+/usr/bin/ranlib libcommon.a
