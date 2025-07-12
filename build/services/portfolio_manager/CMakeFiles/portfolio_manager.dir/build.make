@@ -96,6 +96,9 @@ services/portfolio_manager/portfolio_manager: libs/common/libcommon.a
 services/portfolio_manager/portfolio_manager: libproto_files.a
 services/portfolio_manager/portfolio_manager: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 services/portfolio_manager/portfolio_manager: /usr/lib/x86_64-linux-gnu/libprotobuf.so
+services/portfolio_manager/portfolio_manager: /home/vscode/local/lib/libyaml-cpp.a
+services/portfolio_manager/portfolio_manager: /home/vscode/local/lib/libspdlog.a
+services/portfolio_manager/portfolio_manager: /home/vscode/local/lib/libfmt.a
 services/portfolio_manager/portfolio_manager: services/portfolio_manager/CMakeFiles/portfolio_manager.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspaces/Seven/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable portfolio_manager"
 	cd /workspaces/Seven/build/services/portfolio_manager && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/portfolio_manager.dir/link.txt --verbose=$(VERBOSE)

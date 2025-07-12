@@ -10,11 +10,26 @@ RUN apt-get update && apt-get install -y \
     protobuf-compiler \
     libprotobuf-dev \
     libyaml-cpp-dev \
+    libspdlog-dev \
+    libfmt-dev \
     libssl-dev \
     zlib1g-dev \
     wget \
     build-essential \
+    libgtest-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Catch2 from source
+RUN cd /tmp && \
+    wget https://github.com/catchorg/Catch2/archive/refs/tags/v3.4.0.tar.gz && \
+    tar -xzf v3.4.0.tar.gz && \
+    cd Catch2-3.4.0 && \
+    mkdir build && cd build && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF && \
+    make -j$(nproc) && \
+    make install && \
+    ldconfig && \
+    cd / && rm -rf /tmp/Catch2-3.4.0*
 
 # Download and build NATS C client from source (with OpenSSL)
 RUN cd /tmp && \
@@ -41,8 +56,10 @@ COPY tests/ tests/
 COPY CMakeLists.txt .
 COPY config.yaml .
 
-# Generate protobuf files
-RUN cd proto && chmod +x generate_proto.sh && ./generate_proto.sh
+# Generate protobuf files directly in current directory
+RUN cd proto && \
+    protoc -I=. --cpp_out=.. messages.proto && \
+    echo "✅ Protobuf files generated successfully"
 
 # Build stage
 FROM base AS builder
@@ -56,13 +73,22 @@ RUN mkdir build && cd build && \
 # Runtime stage for portfolio_manager  
 FROM ubuntu:22.04 AS portfolio_manager
 
-# Install minimal runtime dependencies
+# Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     libstdc++6 \
     libprotobuf-dev \
     libyaml-cpp-dev \
+    libspdlog-dev \
+    libfmt-dev \
+    libssl-dev \
+    zlib1g-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy NATS shared libraries from builder stage
+COPY --from=builder /usr/local/lib/libnats* /usr/local/lib/
+COPY --from=builder /usr/local/include/nats /usr/local/include/nats/
+RUN ldconfig
 
 WORKDIR /app
 COPY --from=builder /app/build/services/portfolio_manager/portfolio_manager .

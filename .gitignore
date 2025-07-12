@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+# Log files and directories
+logs/
+*.log

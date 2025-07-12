@@ -54,6 +54,16 @@ A production-ready, high-performance microservices framework built with C++17, N
 - **RAII resource management** - Automatic cleanup prevents memory leaks
 - **Header-only templates** - Fast compilation with inline optimizations
 
+### 🆕 Structured Logging System (NEW!)
+- **Production logging** - spdlog/fmt with structured format or stdout fallback
+- **Daily log rotation** - One file per day (`service_name_YYYY-MM-DD.log`) with backup rotation
+- **Correlation IDs** - 8-character hex IDs for distributed request tracing
+- **Dynamic log levels** - Environment `LOG_LEVEL` (TRACE|DEBUG|INFO|WARN|ERROR|CRITICAL)
+- **Signal handling** - SIGHUP reloads log configuration from environment variables
+- **Request tracking** - Child loggers inherit correlation, request loggers get fresh IDs
+- **Performance metrics** - Automatic handler execution timing in DEBUG mode
+- **Thread-safe integration** - Full ServiceHost and thread pool logging support
+
 ## 📁 Project Structure
 
 ```
@@ -61,6 +71,8 @@ Seven/
 ├── libs/common/                    # Core framework components
 │   ├── service_host.hpp           # Main template-based service framework
 │   ├── service_host_impl.cpp      # NATS integration and signal handling
+│   ├── logger.hpp                 # 🆕 Structured logging with correlation IDs
+│   ├── logger.cpp                 # 🆕 Static member definitions for logger
 │   ├── thread_pool.hpp            # Configurable parallel processing
 │   ├── configuration.hpp          # Full YAML configuration (requires yaml-cpp)
 │   ├── configuration_simple.hpp   # Fallback configuration (no dependencies)

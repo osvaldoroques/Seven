@@ -27,7 +27,7 @@ target_link_libraries(test_graceful_shutdown
     PRIVATE
     common
     proto_files
-    gtest_main
+    Catch2::Catch2WithMain
     pthread
 )
 

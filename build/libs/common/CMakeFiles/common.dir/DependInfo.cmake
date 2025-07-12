@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/workspaces/Seven/libs/common/logger.cpp" "libs/common/CMakeFiles/common.dir/logger.cpp.o" "gcc" "libs/common/CMakeFiles/common.dir/logger.cpp.o.d"
   "/workspaces/Seven/libs/common/service_host_impl.cpp" "libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o" "gcc" "libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o.d"
   )
 

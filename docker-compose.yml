@@ -14,7 +14,7 @@ services:
       retries: 5
       start_period: 5s
 
-  cpp_service:
+  portfolio_manager:
     build:
       context: .
       dockerfile: Dockerfile

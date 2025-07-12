@@ -6,3 +6,4 @@
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("libs/common")
 subdirs("services/portfolio_manager")
+subdirs("tests")

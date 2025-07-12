@@ -17,6 +17,9 @@ RUN apt-get update && apt-get install -y \
     libprotobuf-dev \
     protobuf-compiler \
     libnats-dev \
+    libyaml-cpp-dev \
+    libspdlog-dev \
+    libfmt-dev \
     catch2 \
     python3 \
     python3-pip \

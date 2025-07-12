@@ -2,6 +2,7 @@
 #include <chrono>
 #include <csignal>
 #include <thread>
+#include <fstream>
 #include "service_host.hpp"
 #include "messages_register.hpp"
 #include "messages.pb.h"

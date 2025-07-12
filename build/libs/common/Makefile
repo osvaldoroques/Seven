@@ -140,6 +140,30 @@ common/fast:
 	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/build
 .PHONY : common/fast
 
+logger.o: logger.cpp.o
+.PHONY : logger.o
+
+# target to build an object file
+logger.cpp.o:
+	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/logger.cpp.o
+.PHONY : logger.cpp.o
+
+logger.i: logger.cpp.i
+.PHONY : logger.i
+
+# target to preprocess a source file
+logger.cpp.i:
+	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/logger.cpp.i
+.PHONY : logger.cpp.i
+
+logger.s: logger.cpp.s
+.PHONY : logger.s
+
+# target to generate assembly for a file
+logger.cpp.s:
+	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/logger.cpp.s
+.PHONY : logger.cpp.s
+
 service_host_impl.o: service_host_impl.cpp.o
 .PHONY : service_host_impl.o
 
@@ -174,6 +198,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... common"
+	@echo "... logger.o"
+	@echo "... logger.i"
+	@echo "... logger.s"
 	@echo "... service_host_impl.o"
 	@echo "... service_host_impl.i"
 	@echo "... service_host_impl.s"
