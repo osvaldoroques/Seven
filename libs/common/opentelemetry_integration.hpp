@@ -23,6 +23,10 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 namespace resource = opentelemetry::sdk::resource;
 namespace propagation = opentelemetry::context::propagation;
 namespace trace_propagation = opentelemetry::trace::propagation;
+#else
+#include "opentelemetry_stubs.hpp"
+namespace trace_api = opentelemetry::trace;
+namespace propagation = opentelemetry::propagation;
 #endif
 
 /**
@@ -31,10 +35,10 @@ namespace trace_propagation = opentelemetry::trace::propagation;
  */
 class OpenTelemetryIntegration {
 private:
-#ifdef HAVE_OPENTELEMETRY
     static std::shared_ptr<trace_api::Tracer> tracer_;
-    static std::unique_ptr<trace_propagation::HttpTraceContext> propagator_;
     static bool initialized_;
+#ifdef HAVE_OPENTELEMETRY
+    static std::unique_ptr<trace_propagation::HttpTraceContext> propagator_;
 #endif
 
 public:

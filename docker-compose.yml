@@ -14,15 +14,18 @@ services:
     depends_on:
       - jaeger
 
-  # Jaeger
+  # Jaeger v2 (latest)
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/jaeger:2
     container_name: seven-jaeger
     ports:
       - "16686:16686" # Jaeger UI
       - "14250:14250" # gRPC
+      - "4317:4317"   # OTLP gRPC (direct)
+      - "4318:4318"   # OTLP HTTP (direct)
     environment:
       - COLLECTOR_OTLP_ENABLED=true
+      - JAEGER_DISABLED=false
 
   nats:
     image: nats:latest

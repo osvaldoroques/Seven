@@ -12,7 +12,6 @@
 #include <opentelemetry/sdk/resource/resource.h>
 #include <opentelemetry/trace/provider.h>
 
-namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace otlp = opentelemetry::exporter::otlp;
 namespace resource = opentelemetry::sdk::resource;
@@ -20,6 +19,9 @@ namespace trace_propagation = opentelemetry::trace::propagation;
 
 std::shared_ptr<trace_api::Tracer> OpenTelemetryIntegration::tracer_ = nullptr;
 std::unique_ptr<trace_propagation::HttpTraceContext> OpenTelemetryIntegration::propagator_ = nullptr;
+bool OpenTelemetryIntegration::initialized_ = false;
+#else
+std::shared_ptr<trace_api::Tracer> OpenTelemetryIntegration::tracer_ = nullptr;
 bool OpenTelemetryIntegration::initialized_ = false;
 #endif
 
@@ -192,6 +194,8 @@ std::pair<std::string, std::string> OpenTelemetryIntegration::get_trace_and_span
         
         return {std::string(trace_id, 32), std::string(span_id, 16)};
     }
-#endif
     return {"", ""};
+#else
+    return {"", ""};
+#endif
 }

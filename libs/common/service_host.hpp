@@ -18,12 +18,7 @@
 #include "thread_pool.hpp"
 #include "logger.hpp"
 #include "opentelemetry_integration.hpp"
-
-#ifdef HAVE_YAML_CPP
 #include "configuration.hpp"
-#else
-#include "configuration_simple.hpp"
-#endif
 
 enum class MessageRouting
 {
@@ -50,11 +45,7 @@ public:
         Logger::set_level_from_env();
         Logger::setup_signal_handler();
 
-#ifdef HAVE_SPDLOG
         logger_->info("Initializing ServiceHost - UID: {}, Service: {}", uid_, service_name_);
-#else
-        logger_->info("Initializing ServiceHost - UID: " + uid_ + ", Service: " + service_name_);
-#endif
 
         // Initialize OpenTelemetry
         const char *otlp_endpoint = std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT");
@@ -242,22 +233,14 @@ public:
         {
             if (conn_)
             {
-                #ifdef HAVE_OPENTELEMETRY
                 subscribe_broadcast_V2(type_name);  // Use V2 with tracing
-                #else
-                subscribe_broadcast(type_name);     // Fallback to V1
-                #endif
             }
         }
         else
         {
             if (conn_)
             {
-                #ifdef HAVE_OPENTELEMETRY
                 subscribe_point_to_point_V2(type_name);  // Use V2 with tracing
-                #else
-                subscribe_point_to_point(type_name);     // Fallback to V1
-                #endif
             }
         }
 

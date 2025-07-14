@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     }
 
     // 🔥 Initialize OpenTelemetry before anything else
-    #ifdef HAVE_OPENTELEMETRY
     std::string otel_endpoint = std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT") 
         ? std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT") 
         : "http://otel-collector:4317";
@@ -26,9 +25,6 @@ int main(int argc, char* argv[]) {
     
     OpenTelemetryIntegration::initialize(service_name, otel_endpoint);
     std::cout << "✅ OpenTelemetry initialized: " << service_name << " -> " << otel_endpoint << std::endl;
-    #else
-    std::cout << "ℹ️ OpenTelemetry not available - running without distributed tracing" << std::endl;
-    #endif
 
     // 🚀 Performance optimization demonstration
     std::cout << "\n🚀 Function Pointer Performance Optimization Demo\n";

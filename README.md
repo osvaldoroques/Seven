@@ -325,12 +325,8 @@ OpenTelemetryIntegration::initialize("portfolio_manager", "http://otel-collector
 
 ### Configuration System
 ```cpp
-// Automatic fallback: yaml-cpp if available, simplified otherwise
-#ifdef HAVE_YAML_CPP
-#include "configuration.hpp"     // Full YAML with live reload
-#else
-#include "configuration_simple.hpp"  // Hardcoded defaults
-#endif
+// Full YAML configuration with live reload (permanently enabled)
+#include "configuration.hpp"
 
 // Template-based config access
 auto nats_url = config_.get<std::string>("nats.url", "nats://localhost:4222");

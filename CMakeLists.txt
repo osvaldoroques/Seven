@@ -38,28 +38,16 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 
-# Try to find spdlog and fmt for logging
-find_package(spdlog QUIET)
-find_package(fmt QUIET)
+# Find required dependencies (with fallback support for development)
+find_package(spdlog REQUIRED)
+find_package(fmt REQUIRED)
+message(STATUS "spdlog and fmt found - structured logging enabled")
 
-if(spdlog_FOUND AND fmt_FOUND)
-    message(STATUS "spdlog and fmt found - enabling structured logging")
-    add_compile_definitions(HAVE_SPDLOG)
-else()
-    message(WARNING "spdlog/fmt not found - logging will use simple stdout")
-endif()
-
-# Try to find yaml-cpp, but make it optional
-pkg_check_modules(YAMLCPP yaml-cpp)
-
-if(YAMLCPP_FOUND)
-    message(STATUS "yaml-cpp found - using full configuration support")
-    add_compile_definitions(HAVE_YAML_CPP)
-    # Set library directories for linking
-    link_directories(${YAMLCPP_LIBRARY_DIRS})
-else()
-    message(WARNING "yaml-cpp not found - using simplified configuration")
-endif()
+# Find yaml-cpp (now required)
+pkg_check_modules(YAMLCPP REQUIRED yaml-cpp)
+message(STATUS "yaml-cpp found - full configuration support enabled")
+# Set library directories for linking
+link_directories(${YAMLCPP_LIBRARY_DIRS})
 
 message(STATUS "Protobuf include dirs: ${Protobuf_INCLUDE_DIRS}")
 message(STATUS "Protobuf libraries: ${Protobuf_LIBRARIES}")

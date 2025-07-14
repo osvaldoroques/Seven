@@ -75,6 +75,7 @@ find_library(OPENTELEMETRY_RESOURCES_LIB
     PATHS /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu
 )
 
+# OpenTelemetry setup - try to find but allow fallback
 if(OPENTELEMETRY_INCLUDE_DIR AND OPENTELEMETRY_API_LIB AND OPENTELEMETRY_SDK_LIB)
     target_include_directories(common PUBLIC ${OPENTELEMETRY_INCLUDE_DIR})
     
@@ -93,12 +94,11 @@ if(OPENTELEMETRY_INCLUDE_DIR AND OPENTELEMETRY_API_LIB AND OPENTELEMETRY_SDK_LIB
     
     target_link_libraries(common PUBLIC ${OTEL_LIBS})
     target_compile_definitions(common PUBLIC HAVE_OPENTELEMETRY)
-    message(STATUS "Linking common library with OpenTelemetry tracing")
+    message(STATUS "OpenTelemetry found - distributed tracing enabled")
     message(STATUS "OpenTelemetry include: ${OPENTELEMETRY_INCLUDE_DIR}")
     message(STATUS "OpenTelemetry libraries: ${OTEL_LIBS}")
 else()
-    message(STATUS "OpenTelemetry not found - building without distributed tracing")
-    message(STATUS "  Include dir: ${OPENTELEMETRY_INCLUDE_DIR}")
-    message(STATUS "  API lib: ${OPENTELEMETRY_API_LIB}")
-    message(STATUS "  SDK lib: ${OPENTELEMETRY_SDK_LIB}")
+    message(WARNING "OpenTelemetry not found - using stub implementations for development")
+    message(STATUS "Production builds require OpenTelemetry to be installed")
+    target_compile_definitions(common PUBLIC OTEL_STUBS)
 endif()

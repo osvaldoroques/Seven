@@ -213,7 +213,6 @@ build ContinuousSubmit: phony CMakeFiles/ContinuousSubmit
 build cmake_object_order_depends_target_proto_files: phony || messages.pb.cc messages.pb.h
 
 build CMakeFiles/proto_files.dir/messages.pb.cc.o: CXX_COMPILER__proto_files_ /workspaces/Seven/build/messages.pb.cc || cmake_object_order_depends_target_proto_files
-  DEFINES = -DHAVE_SPDLOG -DHAVE_YAML_CPP
   DEP_FILE = CMakeFiles/proto_files.dir/messages.pb.cc.o.d
   FLAGS = -fPIC -std=gnu++17
   INCLUDES = -I/workspaces/Seven/build
@@ -518,7 +517,7 @@ build messages.pb.h messages.pb.cc | ${cmake_ninja_workdir}messages.pb.h ${cmake
 build cmake_object_order_depends_target_common: phony || cmake_object_order_depends_target_proto_files
 
 build libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o: CXX_COMPILER__common_ /workspaces/Seven/libs/common/service_host_impl.cpp || cmake_object_order_depends_target_common
-  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
+  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
   DEP_FILE = libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o.d
   FLAGS = -fPIC -std=gnu++17
   INCLUDES = -I/workspaces/Seven/libs/common -I/workspaces/Seven/build
@@ -526,7 +525,7 @@ build libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o: CXX_COMPILER__c
   OBJECT_FILE_DIR = libs/common/CMakeFiles/common.dir
 
 build libs/common/CMakeFiles/common.dir/logger.cpp.o: CXX_COMPILER__common_ /workspaces/Seven/libs/common/logger.cpp || cmake_object_order_depends_target_common
-  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
+  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
   DEP_FILE = libs/common/CMakeFiles/common.dir/logger.cpp.o.d
   FLAGS = -fPIC -std=gnu++17
   INCLUDES = -I/workspaces/Seven/libs/common -I/workspaces/Seven/build
@@ -534,7 +533,7 @@ build libs/common/CMakeFiles/common.dir/logger.cpp.o: CXX_COMPILER__common_ /wor
   OBJECT_FILE_DIR = libs/common/CMakeFiles/common.dir
 
 build libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o: CXX_COMPILER__common_ /workspaces/Seven/libs/common/opentelemetry_integration.cpp || cmake_object_order_depends_target_common
-  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
+  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
   DEP_FILE = libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o.d
   FLAGS = -fPIC -std=gnu++17
   INCLUDES = -I/workspaces/Seven/libs/common -I/workspaces/Seven/build
@@ -606,7 +605,7 @@ build libs/common/rebuild_cache: phony libs/common/CMakeFiles/rebuild_cache.util
 build cmake_object_order_depends_target_portfolio_manager: phony || cmake_object_order_depends_target_common cmake_object_order_depends_target_proto_files
 
 build services/portfolio_manager/CMakeFiles/portfolio_manager.dir/main.cpp.o: CXX_COMPILER__portfolio_manager_ /workspaces/Seven/services/portfolio_manager/main.cpp || cmake_object_order_depends_target_portfolio_manager
-  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
+  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
   DEP_FILE = services/portfolio_manager/CMakeFiles/portfolio_manager.dir/main.cpp.o.d
   FLAGS = -fPIE -std=gnu++17
   INCLUDES = -I/workspaces/Seven/libs/common -I/workspaces/Seven/build
@@ -665,112 +664,6 @@ build services/portfolio_manager/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
 build services/portfolio_manager/rebuild_cache: phony services/portfolio_manager/CMakeFiles/rebuild_cache.util
 
 # =============================================================================
-# Write statements declared in CMakeLists.txt:
-# /workspaces/Seven/CMakeLists.txt
-# =============================================================================
-
-# =============================================================================
-# Object build statements for EXECUTABLE target test_service_host
-
-
-#############################################
-# Order-only phony target for test_service_host
-
-build cmake_object_order_depends_target_test_service_host: phony || cmake_object_order_depends_target_common cmake_object_order_depends_target_proto_files
-
-build tests/CMakeFiles/test_service_host.dir/test_service_host.cpp.o: CXX_COMPILER__test_service_host_ /workspaces/Seven/tests/test_service_host.cpp || cmake_object_order_depends_target_test_service_host
-  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
-  DEP_FILE = tests/CMakeFiles/test_service_host.dir/test_service_host.cpp.o.d
-  FLAGS = -fPIE -std=gnu++17
-  INCLUDES = -I/workspaces/Seven/libs/common -I/workspaces/Seven/build
-  OBJECT_DIR = tests/CMakeFiles/test_service_host.dir
-  OBJECT_FILE_DIR = tests/CMakeFiles/test_service_host.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target test_service_host
-
-
-#############################################
-# Link the executable tests/test_service_host
-
-build tests/test_service_host: CXX_EXECUTABLE_LINKER__test_service_host_ tests/CMakeFiles/test_service_host.dir/test_service_host.cpp.o | libs/common/libcommon.a libproto_files.a /usr/lib/libCatch2WithMain.a /usr/lib/x86_64-linux-gnu/libprotobuf.so /usr/lib/x86_64-linux-gnu/libyaml-cpp.so /usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2 /usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1 || libproto_files.a libs/common/libcommon.a
-  LINK_LIBRARIES = libs/common/libcommon.a  libproto_files.a  /usr/lib/libCatch2WithMain.a  -lnats  /usr/lib/x86_64-linux-gnu/libprotobuf.so  /usr/lib/x86_64-linux-gnu/libyaml-cpp.so  /usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2  /usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1  -Wl,--as-needed
-  OBJECT_DIR = tests/CMakeFiles/test_service_host.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = tests/test_service_host
-  TARGET_PDB = test_service_host.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target test_graceful_shutdown
-
-
-#############################################
-# Order-only phony target for test_graceful_shutdown
-
-build cmake_object_order_depends_target_test_graceful_shutdown: phony || cmake_object_order_depends_target_common cmake_object_order_depends_target_proto_files
-
-build tests/CMakeFiles/test_graceful_shutdown.dir/test_graceful_shutdown.cpp.o: CXX_COMPILER__test_graceful_shutdown_ /workspaces/Seven/tests/test_graceful_shutdown.cpp || cmake_object_order_depends_target_test_graceful_shutdown
-  DEFINES = -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB
-  DEP_FILE = tests/CMakeFiles/test_graceful_shutdown.dir/test_graceful_shutdown.cpp.o.d
-  FLAGS = -fPIE -std=gnu++17
-  INCLUDES = -I/workspaces/Seven/libs/common -I/workspaces/Seven/build
-  OBJECT_DIR = tests/CMakeFiles/test_graceful_shutdown.dir
-  OBJECT_FILE_DIR = tests/CMakeFiles/test_graceful_shutdown.dir
-
-
-# =============================================================================
-# Link build statements for EXECUTABLE target test_graceful_shutdown
-
-
-#############################################
-# Link the executable tests/test_graceful_shutdown
-
-build tests/test_graceful_shutdown: CXX_EXECUTABLE_LINKER__test_graceful_shutdown_ tests/CMakeFiles/test_graceful_shutdown.dir/test_graceful_shutdown.cpp.o | libs/common/libcommon.a libproto_files.a /usr/lib/libCatch2WithMain.a /usr/lib/x86_64-linux-gnu/libprotobuf.so /usr/lib/x86_64-linux-gnu/libyaml-cpp.so /usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2 /usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1 || libproto_files.a libs/common/libcommon.a
-  LINK_LIBRARIES = libs/common/libcommon.a  libproto_files.a  /usr/lib/libCatch2WithMain.a  -lpthread  -lnats  /usr/lib/x86_64-linux-gnu/libprotobuf.so  /usr/lib/x86_64-linux-gnu/libyaml-cpp.so  /usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2  /usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1  -Wl,--as-needed
-  OBJECT_DIR = tests/CMakeFiles/test_graceful_shutdown.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = tests/test_graceful_shutdown
-  TARGET_PDB = test_graceful_shutdown.dbg
-
-
-#############################################
-# Utility command for test
-
-build tests/CMakeFiles/test.util: CUSTOM_COMMAND
-  COMMAND = cd /workspaces/Seven/build/tests && /usr/bin/ctest --force-new-ctest-process
-  DESC = Running tests...
-  pool = console
-  restat = 1
-
-build tests/test: phony tests/CMakeFiles/test.util
-
-
-#############################################
-# Utility command for edit_cache
-
-build tests/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /workspaces/Seven/build/tests && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-  DESC = No interactive CMake dialog available...
-  restat = 1
-
-build tests/edit_cache: phony tests/CMakeFiles/edit_cache.util
-
-
-#############################################
-# Utility command for rebuild_cache
-
-build tests/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /workspaces/Seven/build/tests && /usr/bin/cmake --regenerate-during-build -S/workspaces/Seven -B/workspaces/Seven/build
-  DESC = Running CMake to regenerate build system...
-  pool = console
-  restat = 1
-
-build tests/rebuild_cache: phony tests/CMakeFiles/rebuild_cache.util
-
-# =============================================================================
 # Target aliases.
 
 build common: phony libs/common/libcommon.a
@@ -781,10 +674,6 @@ build portfolio_manager: phony services/portfolio_manager/portfolio_manager
 
 build proto_files: phony libproto_files.a
 
-build test_graceful_shutdown: phony tests/test_graceful_shutdown
-
-build test_service_host: phony tests/test_service_host
-
 # =============================================================================
 # Folder targets.
 
@@ -793,7 +682,7 @@ build test_service_host: phony tests/test_service_host
 #############################################
 # Folder: /workspaces/Seven/build
 
-build all: phony libproto_files.a libs/common/all services/portfolio_manager/all tests/all
+build all: phony libproto_files.a libs/common/all services/portfolio_manager/all
 
 # =============================================================================
 
@@ -810,27 +699,20 @@ build libs/common/all: phony libs/common/libcommon.a
 build services/portfolio_manager/all: phony services/portfolio_manager/portfolio_manager
 
 # =============================================================================
-
-#############################################
-# Folder: /workspaces/Seven/build/tests
-
-build tests/all: phony tests/test_service_host tests/test_graceful_shutdown
-
-# =============================================================================
 # Built-in targets
 
 
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | ../CMakeLists.txt ../libs/common/CMakeLists.txt ../services/portfolio_manager/CMakeLists.txt ../tests/CMakeLists.txt /usr/lib/cmake/Catch2/Catch2Config.cmake /usr/lib/cmake/Catch2/Catch2ConfigVersion.cmake /usr/lib/cmake/Catch2/Catch2Targets-none.cmake /usr/lib/cmake/Catch2/Catch2Targets.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config-version.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfig.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigVersion.cmake /usr/share/cmake-3.22/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake /usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.22/Modules/CTest.cmake /usr/share/cmake-3.22/Modules/CTestTargets.cmake /usr/share/cmake-3.22/Modules/CTestUseLaunchers.cmake /usr/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU.cmake /usr/share/cmake-3.22/Modules/DartConfiguration.tcl.in /usr/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.22/Modules/FindPackageMessage.cmake /usr/share/cmake-3.22/Modules/FindPkgConfig.cmake /usr/share/cmake-3.22/Modules/FindProtobuf.cmake /usr/share/cmake-3.22/Modules/FindThreads.cmake /usr/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.22/Modules/Platform/Linux.cmake /usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake /usr/share/cmake-3.22/Modules/SelectLibraryConfigurations.cmake CMakeCache.txt CMakeFiles/3.22.1/CMakeCXXCompiler.cmake CMakeFiles/3.22.1/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | ../CMakeLists.txt ../libs/common/CMakeLists.txt ../services/portfolio_manager/CMakeLists.txt /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config-version.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfig.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigVersion.cmake /usr/share/cmake-3.22/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake /usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.22/Modules/CTest.cmake /usr/share/cmake-3.22/Modules/CTestTargets.cmake /usr/share/cmake-3.22/Modules/CTestUseLaunchers.cmake /usr/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU.cmake /usr/share/cmake-3.22/Modules/DartConfiguration.tcl.in /usr/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.22/Modules/FindPackageMessage.cmake /usr/share/cmake-3.22/Modules/FindPkgConfig.cmake /usr/share/cmake-3.22/Modules/FindProtobuf.cmake /usr/share/cmake-3.22/Modules/FindThreads.cmake /usr/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.22/Modules/Platform/Linux.cmake /usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake /usr/share/cmake-3.22/Modules/SelectLibraryConfigurations.cmake CMakeCache.txt CMakeFiles/3.22.1/CMakeCXXCompiler.cmake CMakeFiles/3.22.1/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build ../CMakeLists.txt ../libs/common/CMakeLists.txt ../services/portfolio_manager/CMakeLists.txt ../tests/CMakeLists.txt /usr/lib/cmake/Catch2/Catch2Config.cmake /usr/lib/cmake/Catch2/Catch2ConfigVersion.cmake /usr/lib/cmake/Catch2/Catch2Targets-none.cmake /usr/lib/cmake/Catch2/Catch2Targets.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config-version.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfig.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigVersion.cmake /usr/share/cmake-3.22/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake /usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.22/Modules/CTest.cmake /usr/share/cmake-3.22/Modules/CTestTargets.cmake /usr/share/cmake-3.22/Modules/CTestUseLaunchers.cmake /usr/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU.cmake /usr/share/cmake-3.22/Modules/DartConfiguration.tcl.in /usr/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.22/Modules/FindPackageMessage.cmake /usr/share/cmake-3.22/Modules/FindPkgConfig.cmake /usr/share/cmake-3.22/Modules/FindProtobuf.cmake /usr/share/cmake-3.22/Modules/FindThreads.cmake /usr/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.22/Modules/Platform/Linux.cmake /usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake /usr/share/cmake-3.22/Modules/SelectLibraryConfigurations.cmake CMakeCache.txt CMakeFiles/3.22.1/CMakeCXXCompiler.cmake CMakeFiles/3.22.1/CMakeSystem.cmake: phony
+build ../CMakeLists.txt ../libs/common/CMakeLists.txt ../services/portfolio_manager/CMakeLists.txt /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config-version.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-config.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/fmt/fmt-targets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfig.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets-none.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigTargets.cmake /usr/lib/x86_64-linux-gnu/cmake/spdlog/spdlogConfigVersion.cmake /usr/share/cmake-3.22/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.22/Modules/CMakeFindDependencyMacro.cmake /usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.22/Modules/CTest.cmake /usr/share/cmake-3.22/Modules/CTestTargets.cmake /usr/share/cmake-3.22/Modules/CTestUseLaunchers.cmake /usr/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Compiler/GNU.cmake /usr/share/cmake-3.22/Modules/DartConfiguration.tcl.in /usr/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.22/Modules/FindPackageMessage.cmake /usr/share/cmake-3.22/Modules/FindPkgConfig.cmake /usr/share/cmake-3.22/Modules/FindProtobuf.cmake /usr/share/cmake-3.22/Modules/FindThreads.cmake /usr/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.22/Modules/Platform/Linux.cmake /usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake /usr/share/cmake-3.22/Modules/SelectLibraryConfigurations.cmake CMakeCache.txt CMakeFiles/3.22.1/CMakeCXXCompiler.cmake CMakeFiles/3.22.1/CMakeSystem.cmake: phony
 
 
 #############################################
