@@ -97,19 +97,35 @@ libs/common/CMakeFiles/common.dir/logger.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/common.dir/logger.cpp.s"
 	cd /workspaces/Seven/build/libs/common && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/Seven/libs/common/logger.cpp -o CMakeFiles/common.dir/logger.cpp.s
 
+libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o: libs/common/CMakeFiles/common.dir/flags.make
+libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o: ../libs/common/opentelemetry_integration.cpp
+libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o: libs/common/CMakeFiles/common.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/workspaces/Seven/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o"
+	cd /workspaces/Seven/build/libs/common && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o -MF CMakeFiles/common.dir/opentelemetry_integration.cpp.o.d -o CMakeFiles/common.dir/opentelemetry_integration.cpp.o -c /workspaces/Seven/libs/common/opentelemetry_integration.cpp
+
+libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/common.dir/opentelemetry_integration.cpp.i"
+	cd /workspaces/Seven/build/libs/common && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspaces/Seven/libs/common/opentelemetry_integration.cpp > CMakeFiles/common.dir/opentelemetry_integration.cpp.i
+
+libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/common.dir/opentelemetry_integration.cpp.s"
+	cd /workspaces/Seven/build/libs/common && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspaces/Seven/libs/common/opentelemetry_integration.cpp -o CMakeFiles/common.dir/opentelemetry_integration.cpp.s
+
 # Object files for target common
 common_OBJECTS = \
 "CMakeFiles/common.dir/service_host_impl.cpp.o" \
-"CMakeFiles/common.dir/logger.cpp.o"
+"CMakeFiles/common.dir/logger.cpp.o" \
+"CMakeFiles/common.dir/opentelemetry_integration.cpp.o"
 
 # External object files for target common
 common_EXTERNAL_OBJECTS =
 
 libs/common/libcommon.a: libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o
 libs/common/libcommon.a: libs/common/CMakeFiles/common.dir/logger.cpp.o
+libs/common/libcommon.a: libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o
 libs/common/libcommon.a: libs/common/CMakeFiles/common.dir/build.make
 libs/common/libcommon.a: libs/common/CMakeFiles/common.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspaces/Seven/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libcommon.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/workspaces/Seven/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libcommon.a"
 	cd /workspaces/Seven/build/libs/common && $(CMAKE_COMMAND) -P CMakeFiles/common.dir/cmake_clean_target.cmake
 	cd /workspaces/Seven/build/libs/common && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/common.dir/link.txt --verbose=$(VERBOSE)
 

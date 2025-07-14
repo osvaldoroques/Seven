@@ -1,5 +1,29 @@
 
 services:
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: seven-otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8888:8888"   # Prometheus metrics
+    depends_on:
+      - jaeger
+
+  # Jaeger
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: seven-jaeger
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14250:14250" # gRPC
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+
   nats:
     image: nats:latest
     container_name: seven-nats-server
@@ -23,8 +47,16 @@ services:
     depends_on:
       nats:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     environment:
       - NATS_URL=nats://nats:4222
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=portfolio_manager
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=portfolio_manager,service.version=1.0.0
+      - SPDLOG_LEVEL=info
+    ports:
+      - "8080:8080"
 
   python_client:
     build:
@@ -34,5 +66,10 @@ services:
     depends_on:
       nats:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     environment:
       - NATS_URL=nats://nats:4222
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=python_client
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=python_client,service.version=1.0.0

@@ -164,6 +164,30 @@ logger.cpp.s:
 	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/logger.cpp.s
 .PHONY : logger.cpp.s
 
+opentelemetry_integration.o: opentelemetry_integration.cpp.o
+.PHONY : opentelemetry_integration.o
+
+# target to build an object file
+opentelemetry_integration.cpp.o:
+	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o
+.PHONY : opentelemetry_integration.cpp.o
+
+opentelemetry_integration.i: opentelemetry_integration.cpp.i
+.PHONY : opentelemetry_integration.i
+
+# target to preprocess a source file
+opentelemetry_integration.cpp.i:
+	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.i
+.PHONY : opentelemetry_integration.cpp.i
+
+opentelemetry_integration.s: opentelemetry_integration.cpp.s
+.PHONY : opentelemetry_integration.s
+
+# target to generate assembly for a file
+opentelemetry_integration.cpp.s:
+	cd /workspaces/Seven/build && $(MAKE) $(MAKESILENT) -f libs/common/CMakeFiles/common.dir/build.make libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.s
+.PHONY : opentelemetry_integration.cpp.s
+
 service_host_impl.o: service_host_impl.cpp.o
 .PHONY : service_host_impl.o
 
@@ -201,6 +225,9 @@ help:
 	@echo "... logger.o"
 	@echo "... logger.i"
 	@echo "... logger.s"
+	@echo "... opentelemetry_integration.o"
+	@echo "... opentelemetry_integration.i"
+	@echo "... opentelemetry_integration.s"
 	@echo "... service_host_impl.o"
 	@echo "... service_host_impl.i"
 	@echo "... service_host_impl.s"

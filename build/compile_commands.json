@@ -15,18 +15,13 @@
   "file": "/workspaces/Seven/libs/common/logger.cpp"
 },
 {
+  "directory": "/workspaces/Seven/build/libs/common",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIC -std=gnu++17 -o CMakeFiles/common.dir/opentelemetry_integration.cpp.o -c /workspaces/Seven/libs/common/opentelemetry_integration.cpp",
+  "file": "/workspaces/Seven/libs/common/opentelemetry_integration.cpp"
+},
+{
   "directory": "/workspaces/Seven/build/services/portfolio_manager",
   "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIE -std=gnu++17 -o CMakeFiles/portfolio_manager.dir/main.cpp.o -c /workspaces/Seven/services/portfolio_manager/main.cpp",
   "file": "/workspaces/Seven/services/portfolio_manager/main.cpp"
-},
-{
-  "directory": "/workspaces/Seven/build/tests",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIE -std=gnu++17 -o CMakeFiles/test_service_host.dir/test_service_host.cpp.o -c /workspaces/Seven/tests/test_service_host.cpp",
-  "file": "/workspaces/Seven/tests/test_service_host.cpp"
-},
-{
-  "directory": "/workspaces/Seven/build/tests",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIE -std=gnu++17 -o CMakeFiles/test_graceful_shutdown.dir/test_graceful_shutdown.cpp.o -c /workspaces/Seven/tests/test_graceful_shutdown.cpp",
-  "file": "/workspaces/Seven/tests/test_graceful_shutdown.cpp"
 }
 ]

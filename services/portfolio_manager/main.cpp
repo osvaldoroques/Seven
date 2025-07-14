@@ -3,6 +3,7 @@
 #include "messages.pb.h"
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
 int main(int argc, char* argv[]) {
     std::string config_file = "config.yaml";
@@ -16,7 +17,7 @@ int main(int argc, char* argv[]) {
     Logger::set_level_from_env();
     
     // Create main logger with tracing
-    Logger main_logger("PortfolioManager");
+    Logger main_logger("PortfolioManager.Main");
     main_logger.info("Starting Portfolio Manager with config: {} trace_id={} span_id={}", 
                      config_file, main_logger.get_trace_id(), main_logger.get_span_id());
     
@@ -26,10 +27,19 @@ int main(int argc, char* argv[]) {
       PortfolioManager::ConfigFileTag{},
       "svc-portfolio-001",
       config_file,
-      MSG_REG(Trevor::HealthCheckRequest, MessageRouting::PointToPoint,
-        [&svc](const Trevor::HealthCheckRequest& req) {
+      MSG_REG(Trevor::HealthCheckRequest, MessageRouting::PointToPoint, ([&svc](const Trevor::HealthCheckRequest& req) {
+            // Extract trace context from incoming message
+            auto trace_context = svc.extract_trace_context_from_message(req);
+            TRACE_SPAN_WITH_CONTEXT("HealthCheck::Process", trace_context);
+            
             auto logger = svc.create_request_logger();
             auto span_logger = logger->create_span_logger("HealthCheck");
+            
+            _trace_span.add_attributes({
+                {"service.operation", "health_check"},
+                {"request.service_name", req.service_name()},
+                {"request.uid", req.uid()}
+            });
             
             span_logger->info("Received HealthCheckRequest from service: {}, UID: {}", 
                             req.service_name(), req.uid());
@@ -39,24 +49,52 @@ int main(int argc, char* argv[]) {
             res.set_uid(svc.get_uid());
             res.set_status(svc.get_status());
             
+            // Inject trace context into response
+            svc.inject_trace_context_into_message(res, _trace_span.get_span());
+            
             svc.publish_point_to_point(req.uid(), res);
+            
+            auto [trace_id, span_id] = _trace_span.get_trace_and_span_ids();
             span_logger->debug("Sent HealthCheckResponse to: {} trace_id={} span_id={}", 
-                             req.uid(), span_logger->get_trace_id(), span_logger->get_span_id());
-        }),
-      MSG_REG(Trevor::PortfolioRequest, MessageRouting::PointToPoint,
-        [&svc](const Trevor::PortfolioRequest& req) {
+                             req.uid(), trace_id, span_id);
+        })),
+      MSG_REG(Trevor::PortfolioRequest, MessageRouting::PointToPoint, ([&svc](const Trevor::PortfolioRequest& req) {
+            // Extract trace context from incoming message
+            auto trace_context = svc.extract_trace_context_from_message(req);
+            TRACE_SPAN_WITH_CONTEXT("Portfolio::Process", trace_context);
+            
             auto logger = svc.create_request_logger();
             auto db_span = logger->create_span_logger("DatabaseLookup");
             auto calc_span = logger->create_span_logger("PortfolioCalculation");
             
+            _trace_span.add_attributes({
+                {"service.operation", "portfolio_request"},
+                {"request.account_id", req.account_id()},
+                {"request.requester_uid", req.requester_uid()}
+            });
+            
             logger->info("Processing PortfolioRequest for account: {}", req.account_id());
-            db_span->debug("Looking up account data in database");
+            
+            // Simulate database lookup span
+            {
+                TRACE_CHILD_SPAN("Database::AccountLookup", _trace_span.get_span());
+                db_span->debug("Looking up account data in database");
+                std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Simulate DB latency
+            }
             
             Trevor::PortfolioResponse res;
             res.set_account_id(req.account_id());
             res.set_total_value(svc.get_config<double>("portfolio_manager.default_portfolio_value", 100000.0));
             
-            calc_span->debug("Calculated portfolio value: {}", res.total_value());
+            // Simulate calculation span
+            {
+                TRACE_CHILD_SPAN("Portfolio::Calculate", _trace_span.get_span());
+                calc_span->debug("Calculated portfolio value: {}", res.total_value());
+                std::this_thread::sleep_for(std::chrono::milliseconds(5)); // Simulate calculation time
+            }
+            
+            // Inject trace context into response
+            svc.inject_trace_context_into_message(res, _trace_span.get_span());
             res.set_cash_balance(25000.0);
             res.set_status("active");
             
@@ -66,9 +104,8 @@ int main(int argc, char* argv[]) {
             
             svc.publish_point_to_point(req.requester_uid(), res);
             logger->info("Sent PortfolioResponse for account: {}", req.account_id());
-        }),
-      MSG_REG(Trevor::MarketDataUpdate, MessageRouting::Broadcast,
-        [&svc](const Trevor::MarketDataUpdate& update) {
+        })),
+      MSG_REG(Trevor::MarketDataUpdate, MessageRouting::Broadcast, ([&svc](const Trevor::MarketDataUpdate& update) {
             auto logger = svc.create_request_logger();
             logger->debug("Market Data Update - Symbol: {}, Price: ${}, Volume: {}", 
                          update.symbol(), update.price(), update.volume());
@@ -90,17 +127,21 @@ int main(int argc, char* argv[]) {
                     logger->debug("Portfolio calculation completed for {}", symbol);
                 });
             }
-        })
+        }))
       // Additional message handlers can be added here as needed
     );
 
-    svc.init_nats();
+    // Use NATS_URL environment variable if available
+    const char* nats_env_url = std::getenv("NATS_URL");
+    std::string nats_url = nats_env_url ? nats_env_url : "nats://localhost:4222";
+    
+    svc.init_nats(nats_url);
     svc.init_jetstream();
     
     // Display configuration values being used with structured logging
     auto logger = svc.get_logger();
     logger->info("Portfolio Manager Configuration:");
-    logger->info("   • NATS URL: {}", svc.get_config<std::string>("nats.url", "nats://localhost:4222"));
+    logger->info("   • NATS URL: {}", nats_url);
     logger->info("   • Thread Pool Size: {}", svc.get_config<int>("thread_pool.size", 4));
     logger->info("   • Max Positions: {}", svc.get_config<int>("portfolio_manager.max_positions", 1000));
     logger->info("   • Update Frequency: {}ms", svc.get_config<int>("portfolio_manager.update_frequency", 1000));

@@ -1,6 +1,6 @@
 # Configuration for Seven microservices
 nats:
-  url: "nats://localhost:4222"
+  url: "nats://nats:4222"  # Docker service name
   timeout: 5000
   max_reconnect: 10
   subjects:

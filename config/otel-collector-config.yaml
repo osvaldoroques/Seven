@@ -1,0 +1,36 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+  memory_limiter:
+    limit_mib: 128
+    check_interval: 1s
+
+exporters:
+  # OTLP exporter for Jaeger (replaces deprecated jaeger exporter)
+  otlp/jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+  
+  # Debug exporter (replaces deprecated logging exporter)
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/jaeger, debug]
+    
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [debug]

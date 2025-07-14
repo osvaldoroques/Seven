@@ -529,32 +529,6 @@ portfolio_manager/fast:
 	$(MAKE) $(MAKESILENT) -f services/portfolio_manager/CMakeFiles/portfolio_manager.dir/build.make services/portfolio_manager/CMakeFiles/portfolio_manager.dir/build
 .PHONY : portfolio_manager/fast
 
-#=============================================================================
-# Target rules for targets named test_service_host
-
-# Build rule for target.
-test_service_host: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_service_host
-.PHONY : test_service_host
-
-# fast build rule for target.
-test_service_host/fast:
-	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_service_host.dir/build.make tests/CMakeFiles/test_service_host.dir/build
-.PHONY : test_service_host/fast
-
-#=============================================================================
-# Target rules for targets named test_graceful_shutdown
-
-# Build rule for target.
-test_graceful_shutdown: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_graceful_shutdown
-.PHONY : test_graceful_shutdown
-
-# fast build rule for target.
-test_graceful_shutdown/fast:
-	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_graceful_shutdown.dir/build.make tests/CMakeFiles/test_graceful_shutdown.dir/build
-.PHONY : test_graceful_shutdown/fast
-
 messages.pb.o: messages.pb.cc.o
 .PHONY : messages.pb.o
 
@@ -619,8 +593,6 @@ help:
 	@echo "... common"
 	@echo "... portfolio_manager"
 	@echo "... proto_files"
-	@echo "... test_graceful_shutdown"
-	@echo "... test_service_host"
 	@echo "... messages.pb.o"
 	@echo "... messages.pb.i"
 	@echo "... messages.pb.s"

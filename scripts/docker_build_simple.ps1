@@ -76,6 +76,12 @@ if ($StartServices) {
         Write-Host "Service URLs:" -ForegroundColor Cyan
         Write-Host "  NATS Server: nats://localhost:4222" -ForegroundColor White
         Write-Host "  NATS Monitor: http://localhost:8222" -ForegroundColor White
+        Write-Host "  Jaeger Tracing UI: http://localhost:16686" -ForegroundColor Yellow
+        Write-Host "  OTEL Collector Metrics: http://localhost:8888/metrics" -ForegroundColor White
+        Write-Host ""
+        Write-Host "Distributed Tracing:" -ForegroundColor Magenta
+        Write-Host "  View request traces at: http://localhost:16686" -ForegroundColor White
+        Write-Host "  Services auto-export OTLP traces to Jaeger" -ForegroundColor White
     }
 } else {
     Write-Host ""

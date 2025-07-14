@@ -15,10 +15,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/vscode/local/lib/cmake/spdlog/spdlogConfigTargets-release.cmake"
   "/home/vscode/local/lib/cmake/spdlog/spdlogConfigTargets.cmake"
   "/home/vscode/local/lib/cmake/spdlog/spdlogConfigVersion.cmake"
-  "/usr/lib/cmake/Catch2/Catch2Config.cmake"
-  "/usr/lib/cmake/Catch2/Catch2ConfigVersion.cmake"
-  "/usr/lib/cmake/Catch2/Catch2Targets-none.cmake"
-  "/usr/lib/cmake/Catch2/Catch2Targets.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake"
   "/usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake"
@@ -52,7 +48,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.22.1/CMakeSystem.cmake"
   "../libs/common/CMakeLists.txt"
   "../services/portfolio_manager/CMakeLists.txt"
-  "../tests/CMakeLists.txt"
   )
 
 # The corresponding makefile is:
@@ -67,7 +62,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "libs/common/CMakeFiles/CMakeDirectoryInformation.cmake"
   "services/portfolio_manager/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "tests/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
@@ -103,6 +97,4 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/proto_files.dir/DependInfo.cmake"
   "libs/common/CMakeFiles/common.dir/DependInfo.cmake"
   "services/portfolio_manager/CMakeFiles/portfolio_manager.dir/DependInfo.cmake"
-  "tests/CMakeFiles/test_service_host.dir/DependInfo.cmake"
-  "tests/CMakeFiles/test_graceful_shutdown.dir/DependInfo.cmake"
   )

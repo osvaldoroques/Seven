@@ -10,12 +10,14 @@
 #include <atomic>
 #include <csignal>
 #include <chrono>
+#include <sstream>
 
 #include <nats/nats.h>
 #include <google/protobuf/message.h>
 
 #include "thread_pool.hpp"
 #include "logger.hpp"
+#include "opentelemetry_integration.hpp"
 
 #ifdef HAVE_YAML_CPP
 #include "configuration.hpp"
@@ -48,6 +50,15 @@ public:
 #else
         logger_->info("Initializing ServiceHost - UID: " + uid_ + ", Service: " + service_name_);
 #endif
+
+        // Initialize OpenTelemetry
+        const char* otlp_endpoint = std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+        if (otlp_endpoint) {
+            OpenTelemetryIntegration::initialize(service_name_, otlp_endpoint);
+            logger_->info("OpenTelemetry initialized with endpoint: {}", otlp_endpoint);
+        } else {
+            logger_->warn("OTEL_EXPORTER_OTLP_ENDPOINT not set, skipping OpenTelemetry initialization");
+        }
         
         // Fold-expression: call Register on each
         (std::forward<Regs>(regs).Register(this), ...);
@@ -220,21 +231,68 @@ public:
         logger_->info("Successfully registered handler for: {}", type_name);
     }
 
-   // Dispatch incoming raw payload to the correct handler
+   // Dispatch incoming raw payload to the correct handler with tracing
     void receive_message(const std::string& type_name,
                          const std::string& payload)
     {
         auto it = handlers_.find(type_name);
         if (it != handlers_.end()) {
-            // Offload to thread pool for parallel processing
-            thread_pool_.submit([handler = it->second, payload, type_name]() {
-                std::cout << "🔄 Processing " << type_name << " in worker thread " 
-                          << std::this_thread::get_id() << std::endl;
+            // Offload to thread pool for parallel processing with tracing
+            thread_pool_.submit([handler = it->second, payload, type_name, this]() {
+                // Start receive span
+                TRACE_SPAN("ServiceHost::receive_message");
+                _trace_span.add_attributes({
+                    {"messaging.operation", "receive"},
+                    {"messaging.destination", type_name},
+                    {"service.name", service_name_},
+                    {"service.instance.id", uid_}
+                });
+
+                auto [trace_id, span_id] = _trace_span.get_trace_and_span_ids();
+                std::ostringstream thread_id_stream;
+                thread_id_stream << std::this_thread::get_id();
+                logger_->debug("Processing {} in worker thread {} trace_id={} span_id={}", 
+                              type_name, thread_id_stream.str(), trace_id, span_id);
+                
                 handler(payload);
             });
         } else {
-            std::cerr << "⚠️ No handler registered for message type: "
-                      << type_name << std::endl;
+            logger_->warn("No handler registered for message type: {}", type_name);
+        }
+    }
+
+    // Helper to extract trace context from protobuf message
+    template<typename T>
+    std::unordered_map<std::string, std::string> extract_trace_context_from_message(const T& message) {
+        std::unordered_map<std::string, std::string> context;
+        if (message.has_trace_metadata()) {
+            const auto& metadata = message.trace_metadata();
+            if (!metadata.traceparent().empty()) {
+                context["traceparent"] = metadata.traceparent();
+            }
+            if (!metadata.tracestate().empty()) {
+                context["tracestate"] = metadata.tracestate();
+            }
+        }
+        return context;
+    }
+
+    // Helper to inject trace context into protobuf message
+    template<typename T>
+    void inject_trace_context_into_message(T& message, std::shared_ptr<void> span = nullptr) {
+        auto headers = OpenTelemetryIntegration::inject_trace_context(span);
+        if (!headers.empty()) {
+            auto* metadata = message.mutable_trace_metadata();
+            auto it = headers.find("traceparent");
+            if (it != headers.end()) {
+                metadata->set_traceparent(it->second);
+            }
+            it = headers.find("tracestate");
+            if (it != headers.end()) {
+                metadata->set_tracestate(it->second);
+            }
+            // Also set correlation ID from logger
+            metadata->set_correlation_id(logger_->get_correlation_id());
         }
     }
 

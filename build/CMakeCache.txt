@@ -209,7 +209,7 @@ Catch2_DIR:PATH=/usr/lib/cmake/Catch2
 DART_TESTING_TIMEOUT:STRING=1500
 
 //Enable building tests
-ENABLE_TESTS:BOOL=ON
+ENABLE_TESTS:BOOL=OFF
 
 //Path to a program.
 GITCOMMAND:FILEPATH=/usr/bin/git
@@ -222,6 +222,18 @@ MEMORYCHECK_COMMAND:FILEPATH=MEMORYCHECK_COMMAND-NOTFOUND
 
 //File that contains suppressions for the memory checker
 MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
+
+//Path to a library.
+OPENTELEMETRY_API_LIB:FILEPATH=OPENTELEMETRY_API_LIB-NOTFOUND
+
+//Path to a file.
+OPENTELEMETRY_INCLUDE_DIR:PATH=OPENTELEMETRY_INCLUDE_DIR-NOTFOUND
+
+//Path to a library.
+OPENTELEMETRY_OTLP_LIB:FILEPATH=OPENTELEMETRY_OTLP_LIB-NOTFOUND
+
+//Path to a library.
+OPENTELEMETRY_SDK_LIB:FILEPATH=OPENTELEMETRY_SDK_LIB-NOTFOUND
 
 //Arguments to supply to pkg-config
 PKG_CONFIG_ARGN:STRING=
@@ -270,6 +282,9 @@ YAMLCPP_LIB:FILEPATH=/home/vscode/local/lib/libyaml-cpp.a
 
 //The directory containing a CMake configuration file for fmt.
 fmt_DIR:PATH=/home/vscode/local/lib/cmake/fmt
+
+//The directory containing a CMake configuration file for opentelemetry-cpp.
+opentelemetry-cpp_DIR:PATH=opentelemetry-cpp_DIR-NOTFOUND
 
 //Path to a library.
 pkgcfg_lib_YAMLCPP_yaml-cpp:FILEPATH=/home/vscode/local/lib/libyaml-cpp.a
@@ -372,7 +387,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=4
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

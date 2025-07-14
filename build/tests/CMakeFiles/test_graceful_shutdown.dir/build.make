@@ -94,6 +94,7 @@ tests/test_graceful_shutdown: tests/CMakeFiles/test_graceful_shutdown.dir/test_g
 tests/test_graceful_shutdown: tests/CMakeFiles/test_graceful_shutdown.dir/build.make
 tests/test_graceful_shutdown: libs/common/libcommon.a
 tests/test_graceful_shutdown: libproto_files.a
+tests/test_graceful_shutdown: /usr/lib/libCatch2WithMain.a
 tests/test_graceful_shutdown: /usr/lib/x86_64-linux-gnu/libprotobuf.so
 tests/test_graceful_shutdown: /home/vscode/local/lib/libyaml-cpp.a
 tests/test_graceful_shutdown: /home/vscode/local/lib/libspdlog.a

@@ -47,7 +47,7 @@ struct TableStruct_messages_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[9]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -73,6 +73,9 @@ extern PortfolioResponseDefaultTypeInternal _PortfolioResponse_default_instance_
 class Position;
 class PositionDefaultTypeInternal;
 extern PositionDefaultTypeInternal _Position_default_instance_;
+class TraceMetadata;
+class TraceMetadataDefaultTypeInternal;
+extern TraceMetadataDefaultTypeInternal _TraceMetadata_default_instance_;
 class TradeRequest;
 class TradeRequestDefaultTypeInternal;
 extern TradeRequestDefaultTypeInternal _TradeRequest_default_instance_;
@@ -87,12 +90,220 @@ template<> ::Trevor::MarketDataUpdate* Arena::CreateMaybeMessage<::Trevor::Marke
 template<> ::Trevor::PortfolioRequest* Arena::CreateMaybeMessage<::Trevor::PortfolioRequest>(Arena*);
 template<> ::Trevor::PortfolioResponse* Arena::CreateMaybeMessage<::Trevor::PortfolioResponse>(Arena*);
 template<> ::Trevor::Position* Arena::CreateMaybeMessage<::Trevor::Position>(Arena*);
+template<> ::Trevor::TraceMetadata* Arena::CreateMaybeMessage<::Trevor::TraceMetadata>(Arena*);
 template<> ::Trevor::TradeRequest* Arena::CreateMaybeMessage<::Trevor::TradeRequest>(Arena*);
 template<> ::Trevor::TradeResponse* Arena::CreateMaybeMessage<::Trevor::TradeResponse>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace Trevor {
 
 // ===================================================================
+
+class TraceMetadata PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Trevor.TraceMetadata) */ {
+ public:
+  inline TraceMetadata() : TraceMetadata(nullptr) {};
+  virtual ~TraceMetadata();
+
+  TraceMetadata(const TraceMetadata& from);
+  TraceMetadata(TraceMetadata&& from) noexcept
+    : TraceMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline TraceMetadata& operator=(const TraceMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TraceMetadata& operator=(TraceMetadata&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const TraceMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const TraceMetadata* internal_default_instance() {
+    return reinterpret_cast<const TraceMetadata*>(
+               &_TraceMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(TraceMetadata& a, TraceMetadata& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TraceMetadata* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TraceMetadata* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TraceMetadata* New() const final {
+    return CreateMaybeMessage<TraceMetadata>(nullptr);
+  }
+
+  TraceMetadata* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<TraceMetadata>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const TraceMetadata& from);
+  void MergeFrom(const TraceMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TraceMetadata* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Trevor.TraceMetadata";
+  }
+  protected:
+  explicit TraceMetadata(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_messages_2eproto);
+    return ::descriptor_table_messages_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTraceparentFieldNumber = 1,
+    kTracestateFieldNumber = 2,
+    kCorrelationIdFieldNumber = 3,
+  };
+  // string traceparent = 1;
+  void clear_traceparent();
+  const std::string& traceparent() const;
+  void set_traceparent(const std::string& value);
+  void set_traceparent(std::string&& value);
+  void set_traceparent(const char* value);
+  void set_traceparent(const char* value, size_t size);
+  std::string* mutable_traceparent();
+  std::string* release_traceparent();
+  void set_allocated_traceparent(std::string* traceparent);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_traceparent();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_traceparent(
+      std::string* traceparent);
+  private:
+  const std::string& _internal_traceparent() const;
+  void _internal_set_traceparent(const std::string& value);
+  std::string* _internal_mutable_traceparent();
+  public:
+
+  // string tracestate = 2;
+  void clear_tracestate();
+  const std::string& tracestate() const;
+  void set_tracestate(const std::string& value);
+  void set_tracestate(std::string&& value);
+  void set_tracestate(const char* value);
+  void set_tracestate(const char* value, size_t size);
+  std::string* mutable_tracestate();
+  std::string* release_tracestate();
+  void set_allocated_tracestate(std::string* tracestate);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_tracestate();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_tracestate(
+      std::string* tracestate);
+  private:
+  const std::string& _internal_tracestate() const;
+  void _internal_set_tracestate(const std::string& value);
+  std::string* _internal_mutable_tracestate();
+  public:
+
+  // string correlation_id = 3;
+  void clear_correlation_id();
+  const std::string& correlation_id() const;
+  void set_correlation_id(const std::string& value);
+  void set_correlation_id(std::string&& value);
+  void set_correlation_id(const char* value);
+  void set_correlation_id(const char* value, size_t size);
+  std::string* mutable_correlation_id();
+  std::string* release_correlation_id();
+  void set_allocated_correlation_id(std::string* correlation_id);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_correlation_id();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_correlation_id(
+      std::string* correlation_id);
+  private:
+  const std::string& _internal_correlation_id() const;
+  void _internal_set_correlation_id(const std::string& value);
+  std::string* _internal_mutable_correlation_id();
+  public:
+
+  // @@protoc_insertion_point(class_scope:Trevor.TraceMetadata)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr traceparent_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr tracestate_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr correlation_id_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
 
 class HealthCheckRequest PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Trevor.HealthCheckRequest) */ {
@@ -136,7 +347,7 @@ class HealthCheckRequest PROTOBUF_FINAL :
                &_HealthCheckRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(HealthCheckRequest& a, HealthCheckRequest& b) {
     a.Swap(&b);
@@ -209,6 +420,7 @@ class HealthCheckRequest PROTOBUF_FINAL :
   enum : int {
     kServiceNameFieldNumber = 1,
     kUidFieldNumber = 2,
+    kTraceMetadataFieldNumber = 3,
   };
   // string service_name = 1;
   void clear_service_name();
@@ -260,6 +472,24 @@ class HealthCheckRequest PROTOBUF_FINAL :
   std::string* _internal_mutable_uid();
   public:
 
+  // .Trevor.TraceMetadata trace_metadata = 3;
+  bool has_trace_metadata() const;
+  private:
+  bool _internal_has_trace_metadata() const;
+  public:
+  void clear_trace_metadata();
+  const ::Trevor::TraceMetadata& trace_metadata() const;
+  ::Trevor::TraceMetadata* release_trace_metadata();
+  ::Trevor::TraceMetadata* mutable_trace_metadata();
+  void set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata);
+  private:
+  const ::Trevor::TraceMetadata& _internal_trace_metadata() const;
+  ::Trevor::TraceMetadata* _internal_mutable_trace_metadata();
+  public:
+  void unsafe_arena_set_allocated_trace_metadata(
+      ::Trevor::TraceMetadata* trace_metadata);
+  ::Trevor::TraceMetadata* unsafe_arena_release_trace_metadata();
+
   // @@protoc_insertion_point(class_scope:Trevor.HealthCheckRequest)
  private:
   class _Internal;
@@ -269,6 +499,7 @@ class HealthCheckRequest PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr service_name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uid_;
+  ::Trevor::TraceMetadata* trace_metadata_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
@@ -316,7 +547,7 @@ class HealthCheckResponse PROTOBUF_FINAL :
                &_HealthCheckResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(HealthCheckResponse& a, HealthCheckResponse& b) {
     a.Swap(&b);
@@ -390,6 +621,7 @@ class HealthCheckResponse PROTOBUF_FINAL :
     kServiceNameFieldNumber = 1,
     kUidFieldNumber = 2,
     kStatusFieldNumber = 3,
+    kTraceMetadataFieldNumber = 4,
   };
   // string service_name = 1;
   void clear_service_name();
@@ -466,6 +698,24 @@ class HealthCheckResponse PROTOBUF_FINAL :
   std::string* _internal_mutable_status();
   public:
 
+  // .Trevor.TraceMetadata trace_metadata = 4;
+  bool has_trace_metadata() const;
+  private:
+  bool _internal_has_trace_metadata() const;
+  public:
+  void clear_trace_metadata();
+  const ::Trevor::TraceMetadata& trace_metadata() const;
+  ::Trevor::TraceMetadata* release_trace_metadata();
+  ::Trevor::TraceMetadata* mutable_trace_metadata();
+  void set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata);
+  private:
+  const ::Trevor::TraceMetadata& _internal_trace_metadata() const;
+  ::Trevor::TraceMetadata* _internal_mutable_trace_metadata();
+  public:
+  void unsafe_arena_set_allocated_trace_metadata(
+      ::Trevor::TraceMetadata* trace_metadata);
+  ::Trevor::TraceMetadata* unsafe_arena_release_trace_metadata();
+
   // @@protoc_insertion_point(class_scope:Trevor.HealthCheckResponse)
  private:
   class _Internal;
@@ -476,6 +726,7 @@ class HealthCheckResponse PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr service_name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uid_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr status_;
+  ::Trevor::TraceMetadata* trace_metadata_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
@@ -523,7 +774,7 @@ class PortfolioRequest PROTOBUF_FINAL :
                &_PortfolioRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(PortfolioRequest& a, PortfolioRequest& b) {
     a.Swap(&b);
@@ -597,6 +848,7 @@ class PortfolioRequest PROTOBUF_FINAL :
     kSymbolsFieldNumber = 3,
     kAccountIdFieldNumber = 1,
     kRequesterUidFieldNumber = 2,
+    kTraceMetadataFieldNumber = 4,
   };
   // repeated string symbols = 3;
   int symbols_size() const;
@@ -672,6 +924,24 @@ class PortfolioRequest PROTOBUF_FINAL :
   std::string* _internal_mutable_requester_uid();
   public:
 
+  // .Trevor.TraceMetadata trace_metadata = 4;
+  bool has_trace_metadata() const;
+  private:
+  bool _internal_has_trace_metadata() const;
+  public:
+  void clear_trace_metadata();
+  const ::Trevor::TraceMetadata& trace_metadata() const;
+  ::Trevor::TraceMetadata* release_trace_metadata();
+  ::Trevor::TraceMetadata* mutable_trace_metadata();
+  void set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata);
+  private:
+  const ::Trevor::TraceMetadata& _internal_trace_metadata() const;
+  ::Trevor::TraceMetadata* _internal_mutable_trace_metadata();
+  public:
+  void unsafe_arena_set_allocated_trace_metadata(
+      ::Trevor::TraceMetadata* trace_metadata);
+  ::Trevor::TraceMetadata* unsafe_arena_release_trace_metadata();
+
   // @@protoc_insertion_point(class_scope:Trevor.PortfolioRequest)
  private:
   class _Internal;
@@ -682,6 +952,7 @@ class PortfolioRequest PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> symbols_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr account_id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr requester_uid_;
+  ::Trevor::TraceMetadata* trace_metadata_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
@@ -729,7 +1000,7 @@ class PortfolioResponse PROTOBUF_FINAL :
                &_PortfolioResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(PortfolioResponse& a, PortfolioResponse& b) {
     a.Swap(&b);
@@ -803,6 +1074,7 @@ class PortfolioResponse PROTOBUF_FINAL :
     kPositionsFieldNumber = 5,
     kAccountIdFieldNumber = 1,
     kStatusFieldNumber = 4,
+    kTraceMetadataFieldNumber = 6,
     kTotalValueFieldNumber = 2,
     kCashBalanceFieldNumber = 3,
   };
@@ -874,6 +1146,24 @@ class PortfolioResponse PROTOBUF_FINAL :
   std::string* _internal_mutable_status();
   public:
 
+  // .Trevor.TraceMetadata trace_metadata = 6;
+  bool has_trace_metadata() const;
+  private:
+  bool _internal_has_trace_metadata() const;
+  public:
+  void clear_trace_metadata();
+  const ::Trevor::TraceMetadata& trace_metadata() const;
+  ::Trevor::TraceMetadata* release_trace_metadata();
+  ::Trevor::TraceMetadata* mutable_trace_metadata();
+  void set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata);
+  private:
+  const ::Trevor::TraceMetadata& _internal_trace_metadata() const;
+  ::Trevor::TraceMetadata* _internal_mutable_trace_metadata();
+  public:
+  void unsafe_arena_set_allocated_trace_metadata(
+      ::Trevor::TraceMetadata* trace_metadata);
+  ::Trevor::TraceMetadata* unsafe_arena_release_trace_metadata();
+
   // double total_value = 2;
   void clear_total_value();
   double total_value() const;
@@ -902,6 +1192,7 @@ class PortfolioResponse PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Trevor::Position > positions_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr account_id_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr status_;
+  ::Trevor::TraceMetadata* trace_metadata_;
   double total_value_;
   double cash_balance_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -951,7 +1242,7 @@ class Position PROTOBUF_FINAL :
                &_Position_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(Position& a, Position& b) {
     a.Swap(&b);
@@ -1159,7 +1450,7 @@ class MarketDataUpdate PROTOBUF_FINAL :
                &_MarketDataUpdate_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(MarketDataUpdate& a, MarketDataUpdate& b) {
     a.Swap(&b);
@@ -1372,7 +1663,7 @@ class TradeRequest PROTOBUF_FINAL :
                &_TradeRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(TradeRequest& a, TradeRequest& b) {
     a.Swap(&b);
@@ -1655,7 +1946,7 @@ class TradeResponse PROTOBUF_FINAL :
                &_TradeResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(TradeResponse& a, TradeResponse& b) {
     a.Swap(&b);
@@ -1876,6 +2167,253 @@ class TradeResponse PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// TraceMetadata
+
+// string traceparent = 1;
+inline void TraceMetadata::clear_traceparent() {
+  traceparent_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& TraceMetadata::traceparent() const {
+  // @@protoc_insertion_point(field_get:Trevor.TraceMetadata.traceparent)
+  return _internal_traceparent();
+}
+inline void TraceMetadata::set_traceparent(const std::string& value) {
+  _internal_set_traceparent(value);
+  // @@protoc_insertion_point(field_set:Trevor.TraceMetadata.traceparent)
+}
+inline std::string* TraceMetadata::mutable_traceparent() {
+  // @@protoc_insertion_point(field_mutable:Trevor.TraceMetadata.traceparent)
+  return _internal_mutable_traceparent();
+}
+inline const std::string& TraceMetadata::_internal_traceparent() const {
+  return traceparent_.Get();
+}
+inline void TraceMetadata::_internal_set_traceparent(const std::string& value) {
+  
+  traceparent_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void TraceMetadata::set_traceparent(std::string&& value) {
+  
+  traceparent_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:Trevor.TraceMetadata.traceparent)
+}
+inline void TraceMetadata::set_traceparent(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  traceparent_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:Trevor.TraceMetadata.traceparent)
+}
+inline void TraceMetadata::set_traceparent(const char* value,
+    size_t size) {
+  
+  traceparent_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:Trevor.TraceMetadata.traceparent)
+}
+inline std::string* TraceMetadata::_internal_mutable_traceparent() {
+  
+  return traceparent_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* TraceMetadata::release_traceparent() {
+  // @@protoc_insertion_point(field_release:Trevor.TraceMetadata.traceparent)
+  return traceparent_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void TraceMetadata::set_allocated_traceparent(std::string* traceparent) {
+  if (traceparent != nullptr) {
+    
+  } else {
+    
+  }
+  traceparent_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), traceparent,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:Trevor.TraceMetadata.traceparent)
+}
+inline std::string* TraceMetadata::unsafe_arena_release_traceparent() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:Trevor.TraceMetadata.traceparent)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  
+  return traceparent_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void TraceMetadata::unsafe_arena_set_allocated_traceparent(
+    std::string* traceparent) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (traceparent != nullptr) {
+    
+  } else {
+    
+  }
+  traceparent_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      traceparent, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.TraceMetadata.traceparent)
+}
+
+// string tracestate = 2;
+inline void TraceMetadata::clear_tracestate() {
+  tracestate_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& TraceMetadata::tracestate() const {
+  // @@protoc_insertion_point(field_get:Trevor.TraceMetadata.tracestate)
+  return _internal_tracestate();
+}
+inline void TraceMetadata::set_tracestate(const std::string& value) {
+  _internal_set_tracestate(value);
+  // @@protoc_insertion_point(field_set:Trevor.TraceMetadata.tracestate)
+}
+inline std::string* TraceMetadata::mutable_tracestate() {
+  // @@protoc_insertion_point(field_mutable:Trevor.TraceMetadata.tracestate)
+  return _internal_mutable_tracestate();
+}
+inline const std::string& TraceMetadata::_internal_tracestate() const {
+  return tracestate_.Get();
+}
+inline void TraceMetadata::_internal_set_tracestate(const std::string& value) {
+  
+  tracestate_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void TraceMetadata::set_tracestate(std::string&& value) {
+  
+  tracestate_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:Trevor.TraceMetadata.tracestate)
+}
+inline void TraceMetadata::set_tracestate(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  tracestate_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:Trevor.TraceMetadata.tracestate)
+}
+inline void TraceMetadata::set_tracestate(const char* value,
+    size_t size) {
+  
+  tracestate_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:Trevor.TraceMetadata.tracestate)
+}
+inline std::string* TraceMetadata::_internal_mutable_tracestate() {
+  
+  return tracestate_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* TraceMetadata::release_tracestate() {
+  // @@protoc_insertion_point(field_release:Trevor.TraceMetadata.tracestate)
+  return tracestate_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void TraceMetadata::set_allocated_tracestate(std::string* tracestate) {
+  if (tracestate != nullptr) {
+    
+  } else {
+    
+  }
+  tracestate_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), tracestate,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:Trevor.TraceMetadata.tracestate)
+}
+inline std::string* TraceMetadata::unsafe_arena_release_tracestate() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:Trevor.TraceMetadata.tracestate)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  
+  return tracestate_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void TraceMetadata::unsafe_arena_set_allocated_tracestate(
+    std::string* tracestate) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (tracestate != nullptr) {
+    
+  } else {
+    
+  }
+  tracestate_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      tracestate, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.TraceMetadata.tracestate)
+}
+
+// string correlation_id = 3;
+inline void TraceMetadata::clear_correlation_id() {
+  correlation_id_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& TraceMetadata::correlation_id() const {
+  // @@protoc_insertion_point(field_get:Trevor.TraceMetadata.correlation_id)
+  return _internal_correlation_id();
+}
+inline void TraceMetadata::set_correlation_id(const std::string& value) {
+  _internal_set_correlation_id(value);
+  // @@protoc_insertion_point(field_set:Trevor.TraceMetadata.correlation_id)
+}
+inline std::string* TraceMetadata::mutable_correlation_id() {
+  // @@protoc_insertion_point(field_mutable:Trevor.TraceMetadata.correlation_id)
+  return _internal_mutable_correlation_id();
+}
+inline const std::string& TraceMetadata::_internal_correlation_id() const {
+  return correlation_id_.Get();
+}
+inline void TraceMetadata::_internal_set_correlation_id(const std::string& value) {
+  
+  correlation_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void TraceMetadata::set_correlation_id(std::string&& value) {
+  
+  correlation_id_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:Trevor.TraceMetadata.correlation_id)
+}
+inline void TraceMetadata::set_correlation_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  correlation_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:Trevor.TraceMetadata.correlation_id)
+}
+inline void TraceMetadata::set_correlation_id(const char* value,
+    size_t size) {
+  
+  correlation_id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:Trevor.TraceMetadata.correlation_id)
+}
+inline std::string* TraceMetadata::_internal_mutable_correlation_id() {
+  
+  return correlation_id_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* TraceMetadata::release_correlation_id() {
+  // @@protoc_insertion_point(field_release:Trevor.TraceMetadata.correlation_id)
+  return correlation_id_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void TraceMetadata::set_allocated_correlation_id(std::string* correlation_id) {
+  if (correlation_id != nullptr) {
+    
+  } else {
+    
+  }
+  correlation_id_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), correlation_id,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:Trevor.TraceMetadata.correlation_id)
+}
+inline std::string* TraceMetadata::unsafe_arena_release_correlation_id() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:Trevor.TraceMetadata.correlation_id)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  
+  return correlation_id_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void TraceMetadata::unsafe_arena_set_allocated_correlation_id(
+    std::string* correlation_id) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (correlation_id != nullptr) {
+    
+  } else {
+    
+  }
+  correlation_id_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      correlation_id, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.TraceMetadata.correlation_id)
+}
+
+// -------------------------------------------------------------------
+
 // HealthCheckRequest
 
 // string service_name = 1;
@@ -2038,6 +2576,87 @@ inline void HealthCheckRequest::unsafe_arena_set_allocated_uid(
   uid_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       uid, GetArena());
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.HealthCheckRequest.uid)
+}
+
+// .Trevor.TraceMetadata trace_metadata = 3;
+inline bool HealthCheckRequest::_internal_has_trace_metadata() const {
+  return this != internal_default_instance() && trace_metadata_ != nullptr;
+}
+inline bool HealthCheckRequest::has_trace_metadata() const {
+  return _internal_has_trace_metadata();
+}
+inline void HealthCheckRequest::clear_trace_metadata() {
+  if (GetArena() == nullptr && trace_metadata_ != nullptr) {
+    delete trace_metadata_;
+  }
+  trace_metadata_ = nullptr;
+}
+inline const ::Trevor::TraceMetadata& HealthCheckRequest::_internal_trace_metadata() const {
+  const ::Trevor::TraceMetadata* p = trace_metadata_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Trevor::TraceMetadata*>(
+      &::Trevor::_TraceMetadata_default_instance_);
+}
+inline const ::Trevor::TraceMetadata& HealthCheckRequest::trace_metadata() const {
+  // @@protoc_insertion_point(field_get:Trevor.HealthCheckRequest.trace_metadata)
+  return _internal_trace_metadata();
+}
+inline void HealthCheckRequest::unsafe_arena_set_allocated_trace_metadata(
+    ::Trevor::TraceMetadata* trace_metadata) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trace_metadata_);
+  }
+  trace_metadata_ = trace_metadata;
+  if (trace_metadata) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.HealthCheckRequest.trace_metadata)
+}
+inline ::Trevor::TraceMetadata* HealthCheckRequest::release_trace_metadata() {
+  auto temp = unsafe_arena_release_trace_metadata();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Trevor::TraceMetadata* HealthCheckRequest::unsafe_arena_release_trace_metadata() {
+  // @@protoc_insertion_point(field_release:Trevor.HealthCheckRequest.trace_metadata)
+  
+  ::Trevor::TraceMetadata* temp = trace_metadata_;
+  trace_metadata_ = nullptr;
+  return temp;
+}
+inline ::Trevor::TraceMetadata* HealthCheckRequest::_internal_mutable_trace_metadata() {
+  
+  if (trace_metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Trevor::TraceMetadata>(GetArena());
+    trace_metadata_ = p;
+  }
+  return trace_metadata_;
+}
+inline ::Trevor::TraceMetadata* HealthCheckRequest::mutable_trace_metadata() {
+  // @@protoc_insertion_point(field_mutable:Trevor.HealthCheckRequest.trace_metadata)
+  return _internal_mutable_trace_metadata();
+}
+inline void HealthCheckRequest::set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete trace_metadata_;
+  }
+  if (trace_metadata) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(trace_metadata);
+    if (message_arena != submessage_arena) {
+      trace_metadata = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, trace_metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  trace_metadata_ = trace_metadata;
+  // @@protoc_insertion_point(field_set_allocated:Trevor.HealthCheckRequest.trace_metadata)
 }
 
 // -------------------------------------------------------------------
@@ -2287,6 +2906,87 @@ inline void HealthCheckResponse::unsafe_arena_set_allocated_status(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.HealthCheckResponse.status)
 }
 
+// .Trevor.TraceMetadata trace_metadata = 4;
+inline bool HealthCheckResponse::_internal_has_trace_metadata() const {
+  return this != internal_default_instance() && trace_metadata_ != nullptr;
+}
+inline bool HealthCheckResponse::has_trace_metadata() const {
+  return _internal_has_trace_metadata();
+}
+inline void HealthCheckResponse::clear_trace_metadata() {
+  if (GetArena() == nullptr && trace_metadata_ != nullptr) {
+    delete trace_metadata_;
+  }
+  trace_metadata_ = nullptr;
+}
+inline const ::Trevor::TraceMetadata& HealthCheckResponse::_internal_trace_metadata() const {
+  const ::Trevor::TraceMetadata* p = trace_metadata_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Trevor::TraceMetadata*>(
+      &::Trevor::_TraceMetadata_default_instance_);
+}
+inline const ::Trevor::TraceMetadata& HealthCheckResponse::trace_metadata() const {
+  // @@protoc_insertion_point(field_get:Trevor.HealthCheckResponse.trace_metadata)
+  return _internal_trace_metadata();
+}
+inline void HealthCheckResponse::unsafe_arena_set_allocated_trace_metadata(
+    ::Trevor::TraceMetadata* trace_metadata) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trace_metadata_);
+  }
+  trace_metadata_ = trace_metadata;
+  if (trace_metadata) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.HealthCheckResponse.trace_metadata)
+}
+inline ::Trevor::TraceMetadata* HealthCheckResponse::release_trace_metadata() {
+  auto temp = unsafe_arena_release_trace_metadata();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Trevor::TraceMetadata* HealthCheckResponse::unsafe_arena_release_trace_metadata() {
+  // @@protoc_insertion_point(field_release:Trevor.HealthCheckResponse.trace_metadata)
+  
+  ::Trevor::TraceMetadata* temp = trace_metadata_;
+  trace_metadata_ = nullptr;
+  return temp;
+}
+inline ::Trevor::TraceMetadata* HealthCheckResponse::_internal_mutable_trace_metadata() {
+  
+  if (trace_metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Trevor::TraceMetadata>(GetArena());
+    trace_metadata_ = p;
+  }
+  return trace_metadata_;
+}
+inline ::Trevor::TraceMetadata* HealthCheckResponse::mutable_trace_metadata() {
+  // @@protoc_insertion_point(field_mutable:Trevor.HealthCheckResponse.trace_metadata)
+  return _internal_mutable_trace_metadata();
+}
+inline void HealthCheckResponse::set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete trace_metadata_;
+  }
+  if (trace_metadata) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(trace_metadata);
+    if (message_arena != submessage_arena) {
+      trace_metadata = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, trace_metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  trace_metadata_ = trace_metadata;
+  // @@protoc_insertion_point(field_set_allocated:Trevor.HealthCheckResponse.trace_metadata)
+}
+
 // -------------------------------------------------------------------
 
 // PortfolioRequest
@@ -2525,6 +3225,87 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 PortfolioRequest::mutable_symbols() {
   // @@protoc_insertion_point(field_mutable_list:Trevor.PortfolioRequest.symbols)
   return &symbols_;
+}
+
+// .Trevor.TraceMetadata trace_metadata = 4;
+inline bool PortfolioRequest::_internal_has_trace_metadata() const {
+  return this != internal_default_instance() && trace_metadata_ != nullptr;
+}
+inline bool PortfolioRequest::has_trace_metadata() const {
+  return _internal_has_trace_metadata();
+}
+inline void PortfolioRequest::clear_trace_metadata() {
+  if (GetArena() == nullptr && trace_metadata_ != nullptr) {
+    delete trace_metadata_;
+  }
+  trace_metadata_ = nullptr;
+}
+inline const ::Trevor::TraceMetadata& PortfolioRequest::_internal_trace_metadata() const {
+  const ::Trevor::TraceMetadata* p = trace_metadata_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Trevor::TraceMetadata*>(
+      &::Trevor::_TraceMetadata_default_instance_);
+}
+inline const ::Trevor::TraceMetadata& PortfolioRequest::trace_metadata() const {
+  // @@protoc_insertion_point(field_get:Trevor.PortfolioRequest.trace_metadata)
+  return _internal_trace_metadata();
+}
+inline void PortfolioRequest::unsafe_arena_set_allocated_trace_metadata(
+    ::Trevor::TraceMetadata* trace_metadata) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trace_metadata_);
+  }
+  trace_metadata_ = trace_metadata;
+  if (trace_metadata) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.PortfolioRequest.trace_metadata)
+}
+inline ::Trevor::TraceMetadata* PortfolioRequest::release_trace_metadata() {
+  auto temp = unsafe_arena_release_trace_metadata();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Trevor::TraceMetadata* PortfolioRequest::unsafe_arena_release_trace_metadata() {
+  // @@protoc_insertion_point(field_release:Trevor.PortfolioRequest.trace_metadata)
+  
+  ::Trevor::TraceMetadata* temp = trace_metadata_;
+  trace_metadata_ = nullptr;
+  return temp;
+}
+inline ::Trevor::TraceMetadata* PortfolioRequest::_internal_mutable_trace_metadata() {
+  
+  if (trace_metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Trevor::TraceMetadata>(GetArena());
+    trace_metadata_ = p;
+  }
+  return trace_metadata_;
+}
+inline ::Trevor::TraceMetadata* PortfolioRequest::mutable_trace_metadata() {
+  // @@protoc_insertion_point(field_mutable:Trevor.PortfolioRequest.trace_metadata)
+  return _internal_mutable_trace_metadata();
+}
+inline void PortfolioRequest::set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete trace_metadata_;
+  }
+  if (trace_metadata) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(trace_metadata);
+    if (message_arena != submessage_arena) {
+      trace_metadata = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, trace_metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  trace_metadata_ = trace_metadata;
+  // @@protoc_insertion_point(field_set_allocated:Trevor.PortfolioRequest.trace_metadata)
 }
 
 // -------------------------------------------------------------------
@@ -2770,6 +3551,87 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Trevor::Position >&
 PortfolioResponse::positions() const {
   // @@protoc_insertion_point(field_list:Trevor.PortfolioResponse.positions)
   return positions_;
+}
+
+// .Trevor.TraceMetadata trace_metadata = 6;
+inline bool PortfolioResponse::_internal_has_trace_metadata() const {
+  return this != internal_default_instance() && trace_metadata_ != nullptr;
+}
+inline bool PortfolioResponse::has_trace_metadata() const {
+  return _internal_has_trace_metadata();
+}
+inline void PortfolioResponse::clear_trace_metadata() {
+  if (GetArena() == nullptr && trace_metadata_ != nullptr) {
+    delete trace_metadata_;
+  }
+  trace_metadata_ = nullptr;
+}
+inline const ::Trevor::TraceMetadata& PortfolioResponse::_internal_trace_metadata() const {
+  const ::Trevor::TraceMetadata* p = trace_metadata_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::Trevor::TraceMetadata*>(
+      &::Trevor::_TraceMetadata_default_instance_);
+}
+inline const ::Trevor::TraceMetadata& PortfolioResponse::trace_metadata() const {
+  // @@protoc_insertion_point(field_get:Trevor.PortfolioResponse.trace_metadata)
+  return _internal_trace_metadata();
+}
+inline void PortfolioResponse::unsafe_arena_set_allocated_trace_metadata(
+    ::Trevor::TraceMetadata* trace_metadata) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trace_metadata_);
+  }
+  trace_metadata_ = trace_metadata;
+  if (trace_metadata) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Trevor.PortfolioResponse.trace_metadata)
+}
+inline ::Trevor::TraceMetadata* PortfolioResponse::release_trace_metadata() {
+  auto temp = unsafe_arena_release_trace_metadata();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::Trevor::TraceMetadata* PortfolioResponse::unsafe_arena_release_trace_metadata() {
+  // @@protoc_insertion_point(field_release:Trevor.PortfolioResponse.trace_metadata)
+  
+  ::Trevor::TraceMetadata* temp = trace_metadata_;
+  trace_metadata_ = nullptr;
+  return temp;
+}
+inline ::Trevor::TraceMetadata* PortfolioResponse::_internal_mutable_trace_metadata() {
+  
+  if (trace_metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Trevor::TraceMetadata>(GetArena());
+    trace_metadata_ = p;
+  }
+  return trace_metadata_;
+}
+inline ::Trevor::TraceMetadata* PortfolioResponse::mutable_trace_metadata() {
+  // @@protoc_insertion_point(field_mutable:Trevor.PortfolioResponse.trace_metadata)
+  return _internal_mutable_trace_metadata();
+}
+inline void PortfolioResponse::set_allocated_trace_metadata(::Trevor::TraceMetadata* trace_metadata) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete trace_metadata_;
+  }
+  if (trace_metadata) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(trace_metadata);
+    if (message_arena != submessage_arena) {
+      trace_metadata = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, trace_metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  trace_metadata_ = trace_metadata;
+  // @@protoc_insertion_point(field_set_allocated:Trevor.PortfolioResponse.trace_metadata)
 }
 
 // -------------------------------------------------------------------
@@ -4003,6 +4865,8 @@ inline void TradeResponse::unsafe_arena_set_allocated_reason(
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

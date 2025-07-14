@@ -52,11 +52,6 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/workspaces/Seven/build/services/portfolio_manager/cmake_install.cmake")
 endif()
 
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
-  include("/workspaces/Seven/build/tests/cmake_install.cmake")
-endif()
-
 if(CMAKE_INSTALL_COMPONENT)
   set(CMAKE_INSTALL_MANIFEST "install_manifest_${CMAKE_INSTALL_COMPONENT}.txt")
 else()

@@ -38,8 +38,3 @@
 /workspaces/Seven/build/services/portfolio_manager/CMakeFiles/test.dir
 /workspaces/Seven/build/services/portfolio_manager/CMakeFiles/edit_cache.dir
 /workspaces/Seven/build/services/portfolio_manager/CMakeFiles/rebuild_cache.dir
-/workspaces/Seven/build/tests/CMakeFiles/test_service_host.dir
-/workspaces/Seven/build/tests/CMakeFiles/test_graceful_shutdown.dir
-/workspaces/Seven/build/tests/CMakeFiles/test.dir
-/workspaces/Seven/build/tests/CMakeFiles/edit_cache.dir
-/workspaces/Seven/build/tests/CMakeFiles/rebuild_cache.dir

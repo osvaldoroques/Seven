@@ -17,7 +17,58 @@ RUN apt-get update && apt-get install -y \
     wget \
     build-essential \
     libgtest-dev \
+    libcurl4-openssl-dev \
+    git \
+    libgrpc++-dev \
+    libgrpc-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Install nlohmann/json manually since package name varies by Ubuntu version
+RUN cd /tmp && \
+    wget https://github.com/nlohmann/json/releases/download/v3.11.2/json.hpp && \
+    mkdir -p /usr/local/include/nlohmann && \
+    mv json.hpp /usr/local/include/nlohmann/ && \
+    rm -rf /tmp/json.hpp
+
+# Install additional dependencies for OpenTelemetry build
+RUN apt-get update && apt-get install -y \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    uuid-dev \
+    zlib1g-dev \
+    libabsl-dev \
+    libre2-dev \
+    libgrpc++-dev \
+    libprotobuf-dev \
+    protobuf-compiler-grpc
+
+# Install OpenTelemetry C++ SDK (required for observability)
+RUN cd /tmp && \
+    git clone --depth 1 --branch v1.9.1 https://github.com/open-telemetry/opentelemetry-cpp.git && \
+    cd opentelemetry-cpp && \
+    git submodule update --init --recursive && \
+    mkdir build && cd build && \
+    cmake .. \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=OFF \
+        -DWITH_ZIPKIN=OFF \
+        -DWITH_JAEGER=OFF \
+        -DBUILD_TESTING=OFF \
+        -DWITH_EXAMPLES=OFF \
+        -DWITH_BENCHMARK=OFF \
+        -DWITH_LOGS_PREVIEW=OFF \
+        -DWITH_METRICS_PREVIEW=OFF \
+        -DCMAKE_CXX_STANDARD=17 && \
+    make -j2 && \
+    make install && \
+    ldconfig && \
+    cd / && rm -rf /tmp/opentelemetry-cpp && \
+    echo "OpenTelemetry installation completed" && \
+    ls -la /usr/local/lib/libopentelemetry* && \
+    ls -la /usr/local/include/opentelemetry/
 
 # Install Catch2 from source
 RUN cd /tmp && \
@@ -67,7 +118,7 @@ FROM base AS builder
 # Clean any existing build artifacts and create fresh build directory
 RUN rm -rf build
 RUN mkdir build && cd build && \
-    cmake -GNinja .. && \
+    cmake -GNinja -DENABLE_TESTS=OFF .. && \
     ninja
 
 # Runtime stage for portfolio_manager  
@@ -82,12 +133,18 @@ RUN apt-get update && apt-get install -y \
     libfmt-dev \
     libssl-dev \
     zlib1g-dev \
+    libgrpc++-dev \
+    libcurl4-openssl-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy NATS shared libraries from builder stage
 COPY --from=builder /usr/local/lib/libnats* /usr/local/lib/
 COPY --from=builder /usr/local/include/nats /usr/local/include/nats/
+
+# Copy OpenTelemetry shared libraries from builder stage
+COPY --from=builder /usr/local/lib/libopentelemetry* /usr/local/lib/
+COPY --from=builder /usr/local/include/opentelemetry /usr/local/include/opentelemetry/
 RUN ldconfig
 
 WORKDIR /app
