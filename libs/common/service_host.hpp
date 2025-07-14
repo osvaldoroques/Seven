@@ -348,6 +348,9 @@ public:
     void enable_tracing();
     void disable_tracing();
     bool is_tracing_enabled() const { return tracing_enabled_; }
+    
+    // 🚀 Performance benchmarking and validation
+    void run_performance_benchmark(int iterations = 10000, bool verbose = true);
 
     // Legacy V2 methods (kept for compatibility)
     void publish_broadcast_V2(const google::protobuf::Message &message);

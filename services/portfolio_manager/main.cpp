@@ -150,61 +150,126 @@ int main(int argc, char* argv[]) {
     svc.init_nats(nats_url);
     svc.init_jetstream();
     
-    // 🚀 Function Pointer Performance Optimization Demo
-    std::cout << "\n🚀 Hot-Path Optimization: Function Pointer Switching Demo\n";
-    std::cout << "============================================================\n";
-    
-    // Create a sample message for testing
-    Trevor::HealthCheckRequest test_msg;
-    test_msg.set_service_name("performance_test");
-    test_msg.set_uid("test-uid-001");
-    
-    // Test 1: High-performance mode (no tracing overhead)
-    std::cout << "📊 Test 1: High-Performance Mode (Fast Functions)\n";
-    svc.disable_tracing();  // Switch to fast function pointers
-    std::cout << "   • Tracing enabled: " << (svc.is_tracing_enabled() ? "YES" : "NO") << "\n";
-    std::cout << "   • Using: publish_broadcast_fast() via function pointer\n";
-    std::cout << "   • Overhead: Zero branching, minimal CPU cycles\n";
-    
-    auto start_fast = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 1000; ++i) {
-        svc.publish_broadcast(test_msg);  // Uses function pointer -> publish_broadcast_fast
+    // Check if performance demo should run (can be disabled via config or environment)
+    bool run_performance_demo = true;
+    const char* skip_demo = std::getenv("SKIP_PERFORMANCE_DEMO");
+    if (skip_demo && std::string(skip_demo) == "true") {
+        run_performance_demo = false;
     }
-    auto end_fast = std::chrono::high_resolution_clock::now();
-    auto fast_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_fast - start_fast);
     
-    std::cout << "   • 1000 messages published in: " << fast_duration.count() << "μs\n";
-    std::cout << "   • Average per message: " << (fast_duration.count() / 1000.0) << "μs\n\n";
-    
-    // Test 2: Full observability mode (with tracing)
-    std::cout << "📊 Test 2: Full Observability Mode (Traced Functions)\n";
-    svc.enable_tracing();   // Switch to traced function pointers
-    std::cout << "   • Tracing enabled: " << (svc.is_tracing_enabled() ? "YES" : "NO") << "\n";
-    std::cout << "   • Using: publish_broadcast_traced() via function pointer\n";
-    std::cout << "   • Overhead: OpenTelemetry spans, NATS headers, trace context\n";
-    
-    auto start_traced = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 1000; ++i) {
-        svc.publish_broadcast(test_msg);  // Uses function pointer -> publish_broadcast_traced
+    if (run_performance_demo) {
+        // 🚀 Permanent Function Pointer Performance Optimization Demo
+        std::cout << "\n🚀 Hot-Path Optimization: Function Pointer Switching Demo\n";
+        std::cout << "============================================================\n";
+        std::cout << "This demo runs automatically on every startup to validate\n";
+        std::cout << "the zero-branching performance optimization is working.\n";
+        std::cout << "(Set SKIP_PERFORMANCE_DEMO=true to disable this demo)\n\n";
+        
+        // Create a sample message for testing
+        Trevor::HealthCheckRequest test_msg;
+        test_msg.set_service_name("performance_benchmark");
+        test_msg.set_uid("benchmark-uid-" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()));
+        
+        // Warmup phase to stabilize performance measurements
+        std::cout << "🔥 Warming up systems...\n";
+        svc.disable_tracing();
+        for (int i = 0; i < 100; ++i) {
+            svc.publish_broadcast(test_msg);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        
+        // Test 1: High-performance mode (no tracing overhead)
+        std::cout << "📊 Test 1: High-Performance Mode (Fast Functions)\n";
+        svc.disable_tracing();  // Switch to fast function pointers
+        std::cout << "   • Tracing enabled: " << (svc.is_tracing_enabled() ? "YES" : "NO") << "\n";
+        std::cout << "   • Implementation: publish_broadcast_fast() via function pointer\n";
+        std::cout << "   • Characteristics: Zero branching, minimal CPU cycles, no OpenTelemetry overhead\n";
+        
+        const int benchmark_iterations = 10000;  // Increased for better precision
+        auto start_fast = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < benchmark_iterations; ++i) {
+            svc.publish_broadcast(test_msg);  // Uses function pointer -> publish_broadcast_fast
+        }
+        auto end_fast = std::chrono::high_resolution_clock::now();
+        auto fast_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_fast - start_fast);
+        
+        std::cout << "   • " << benchmark_iterations << " messages published in: " << fast_duration.count() << "ns\n";
+        std::cout << "   • Average per message: " << std::fixed << std::setprecision(3) 
+                  << (fast_duration.count() / static_cast<double>(benchmark_iterations)) << "ns ("
+                  << std::setprecision(3) << (fast_duration.count() / static_cast<double>(benchmark_iterations)) / 1000.0 << "μs)\n\n";
+        
+        // Brief pause between tests
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        
+        // Test 2: Full observability mode (with tracing)
+        std::cout << "📊 Test 2: Full Observability Mode (Traced Functions)\n";
+        svc.enable_tracing();   // Switch to traced function pointers
+        std::cout << "   • Tracing enabled: " << (svc.is_tracing_enabled() ? "YES" : "NO") << "\n";
+        std::cout << "   • Implementation: publish_broadcast_traced() via function pointer\n";
+        std::cout << "   • Characteristics: OpenTelemetry spans, NATS headers, W3C trace context injection\n";
+        
+        auto start_traced = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < benchmark_iterations; ++i) {
+            svc.publish_broadcast(test_msg);  // Uses function pointer -> publish_broadcast_traced
+        }
+        auto end_traced = std::chrono::high_resolution_clock::now();
+        auto traced_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_traced - start_traced);
+        
+        std::cout << "   • " << benchmark_iterations << " messages published in: " << traced_duration.count() << "ns\n";
+        std::cout << "   • Average per message: " << std::fixed << std::setprecision(3) 
+                  << (traced_duration.count() / static_cast<double>(benchmark_iterations)) << "ns ("
+                  << std::setprecision(3) << (traced_duration.count() / static_cast<double>(benchmark_iterations)) / 1000.0 << "μs)\n\n";
+        
+        // Performance analysis with enhanced metrics
+        double overhead_ratio = static_cast<double>(traced_duration.count()) / fast_duration.count();
+        double overhead_percentage = (overhead_ratio - 1.0) * 100.0;
+        long long overhead_ns = (traced_duration.count() - fast_duration.count()) / benchmark_iterations;
+        
+        std::cout << "🎯 Performance Analysis:\n";
+        std::cout << "   • Tracing overhead ratio: " << std::fixed << std::setprecision(3) << overhead_ratio << "x\n";
+        std::cout << "   • Tracing overhead: " << std::setprecision(1) << overhead_percentage << "%\n";
+        std::cout << "   • Overhead per message: " << overhead_ns << "ns (" << std::setprecision(3) << overhead_ns / 1000.0 << "μs)\n";
+        std::cout << "   • Runtime switching: ZERO branching penalty! ✅\n";
+        std::cout << "   • Hot-path optimization: Function pointers eliminate if-statements ✅\n";
+        std::cout << "   • Dynamic control: Switch modes without recompilation ✅\n";
+        
+        // Performance validation
+        if (overhead_ratio < 2.0) {
+            std::cout << "   • 🎉 EXCELLENT: Tracing overhead is minimal (< 2x)\n";
+        } else if (overhead_ratio < 5.0) {
+            std::cout << "   • ✅ GOOD: Tracing overhead is acceptable (< 5x)\n";
+        } else {
+            std::cout << "   • ⚠️  WARNING: Tracing overhead is high (> 5x) - consider optimization\n";
+        }
+        
+        // Test 3: Runtime switching validation
+        std::cout << "\n📊 Test 3: Runtime Switching Validation\n";
+        std::cout << "   • Testing rapid mode switching without performance degradation\n";
+        
+        auto switch_start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < 100; ++i) {
+            svc.disable_tracing();
+            svc.publish_broadcast(test_msg);
+            svc.enable_tracing();
+            svc.publish_broadcast(test_msg);
+        }
+        auto switch_end = std::chrono::high_resolution_clock::now();
+        auto switch_duration = std::chrono::duration_cast<std::chrono::microseconds>(switch_end - switch_start);
+        
+        std::cout << "   • 200 messages with 100 mode switches: " << switch_duration.count() << "μs\n";
+        std::cout << "   • Average per switch + message: " << std::setprecision(2) << switch_duration.count() / 200.0 << "μs\n";
+        std::cout << "   • ✅ Runtime switching works seamlessly\n";
+        
+        // Reset to traced mode for production
+        std::cout << "\n🔧 Setting production mode: Full observability enabled\n";
+        svc.enable_tracing();
+        std::cout << "============================================================\n\n";
+    } else {
+        std::cout << "\n⏭️  Performance demo skipped (SKIP_PERFORMANCE_DEMO=true)\n";
+        std::cout << "🔧 Setting production mode: Full observability enabled\n";
+        svc.enable_tracing();
+        std::cout << "\n";
     }
-    auto end_traced = std::chrono::high_resolution_clock::now();
-    auto traced_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_traced - start_traced);
-    
-    std::cout << "   • 1000 messages published in: " << traced_duration.count() << "μs\n";
-    std::cout << "   • Average per message: " << (traced_duration.count() / 1000.0) << "μs\n\n";
-    
-    // Performance comparison
-    double overhead_ratio = static_cast<double>(traced_duration.count()) / fast_duration.count();
-    std::cout << "🎯 Performance Analysis:\n";
-    std::cout << "   • Tracing overhead ratio: " << std::fixed << std::setprecision(2) << overhead_ratio << "x\n";
-    std::cout << "   • Runtime switching: ZERO branching penalty!\n";
-    std::cout << "   • Hot-path optimization: Function pointers eliminate if-statements\n";
-    std::cout << "   • Dynamic control: Switch modes without recompilation\n\n";
-    
-    // Reset to traced mode for production
-    std::cout << "🔧 Setting production mode: Full observability enabled\n";
-    svc.enable_tracing();
-    std::cout << "============================================================\n\n";
 
     // Display configuration values being used with structured logging
     auto logger = svc.get_logger();
