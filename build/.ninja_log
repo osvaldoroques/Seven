@@ -1,0 +1,17 @@
+# ninja log v5
+121	16772	1752505455975335000	tests/CMakeFiles/test_service_host.dir/test_service_host.cpp.o	6e947e3e8e1cbfd9
+4303	8657	1752505449599341800	tests/test_graceful_shutdown	bd9eb9d59b9b5d3d
+110	2811	1752505443368069200	libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o	fe617ed333faeffa
+59	93	1752505440485035400	messages.pb.cc	648023652bb1584c
+59	93	1752505440485035400	/workspaces/Seven/build/messages.pb.h	648023652bb1584c
+59	93	1752505440485035400	messages.pb.h	648023652bb1584c
+116	3840	1752505444463658500	services/portfolio_manager/CMakeFiles/portfolio_manager.dir/main.cpp.o	4fbdc563d818ac7c
+4300	7391	1752505448259227600	services/portfolio_manager/portfolio_manager	3b16e484645e0951
+59	93	1752505440485035400	/workspaces/Seven/build/messages.pb.cc	648023652bb1584c
+107	1337	1752505441803516600	CMakeFiles/proto_files.dir/messages.pb.cc.o	ebe869cdd91a98f4
+2834	4296	1752505444961390700	libs/common/libcommon.a	4625d077b02ae95c
+114	634	1752505441051858700	libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o	911be651c1a7c939
+112	1207	1752505441657906200	libs/common/CMakeFiles/common.dir/logger.cpp.o	9b18ca5105c488ed
+16791	27868	1752505467875741100	tests/test_service_host	2181869322d9673a
+1361	1938	1752505442448754900	libproto_files.a	d818dcb85127c1be
+125	3415	1752505444009894800	tests/CMakeFiles/test_graceful_shutdown.dir/test_graceful_shutdown.cpp.o	e2d3a10a795ff7ee

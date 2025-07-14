@@ -5,23 +5,33 @@
   "file": "/workspaces/Seven/build/messages.pb.cc"
 },
 {
-  "directory": "/workspaces/Seven/build/libs/common",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIC -std=gnu++17 -o CMakeFiles/common.dir/service_host_impl.cpp.o -c /workspaces/Seven/libs/common/service_host_impl.cpp",
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o -c /workspaces/Seven/libs/common/service_host_impl.cpp",
   "file": "/workspaces/Seven/libs/common/service_host_impl.cpp"
 },
 {
-  "directory": "/workspaces/Seven/build/libs/common",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIC -std=gnu++17 -o CMakeFiles/common.dir/logger.cpp.o -c /workspaces/Seven/libs/common/logger.cpp",
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/logger.cpp.o -c /workspaces/Seven/libs/common/logger.cpp",
   "file": "/workspaces/Seven/libs/common/logger.cpp"
 },
 {
-  "directory": "/workspaces/Seven/build/libs/common",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIC -std=gnu++17 -o CMakeFiles/common.dir/opentelemetry_integration.cpp.o -c /workspaces/Seven/libs/common/opentelemetry_integration.cpp",
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o -c /workspaces/Seven/libs/common/opentelemetry_integration.cpp",
   "file": "/workspaces/Seven/libs/common/opentelemetry_integration.cpp"
 },
 {
-  "directory": "/workspaces/Seven/build/services/portfolio_manager",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -isystem /home/vscode/local/include -fPIE -std=gnu++17 -o CMakeFiles/portfolio_manager.dir/main.cpp.o -c /workspaces/Seven/services/portfolio_manager/main.cpp",
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIE -std=gnu++17 -o services/portfolio_manager/CMakeFiles/portfolio_manager.dir/main.cpp.o -c /workspaces/Seven/services/portfolio_manager/main.cpp",
   "file": "/workspaces/Seven/services/portfolio_manager/main.cpp"
+},
+{
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIE -std=gnu++17 -o tests/CMakeFiles/test_service_host.dir/test_service_host.cpp.o -c /workspaces/Seven/tests/test_service_host.cpp",
+  "file": "/workspaces/Seven/tests/test_service_host.cpp"
+},
+{
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DHAVE_SPDLOG -DHAVE_YAML_CPP -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIE -std=gnu++17 -o tests/CMakeFiles/test_graceful_shutdown.dir/test_graceful_shutdown.cpp.o -c /workspaces/Seven/tests/test_graceful_shutdown.cpp",
+  "file": "/workspaces/Seven/tests/test_graceful_shutdown.cpp"
 }
 ]

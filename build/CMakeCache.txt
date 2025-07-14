@@ -27,9 +27,6 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 // MinSizeRel ...
 CMAKE_BUILD_TYPE:STRING=
 
-//Enable/Disable color output during build.
-CMAKE_COLOR_MAKEFILE:BOOL=ON
-
 //CXX compiler
 CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
 
@@ -83,8 +80,8 @@ CMAKE_INSTALL_PREFIX:PATH=/usr/local
 //Path to a program.
 CMAKE_LINKER:FILEPATH=/usr/bin/ld
 
-//Path to a program.
-CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/gmake
+//Program used to build from build.ninja files.
+CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/ninja
 
 //Flags used by the linker during the creation of modules during
 // all build types.
@@ -114,9 +111,6 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 
 //Path to a program.
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
-
-//No help, variable specified on the command line.
-CMAKE_PREFIX_PATH:UNINITIALIZED=/home/vscode/local
 
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
@@ -209,7 +203,7 @@ Catch2_DIR:PATH=/usr/lib/cmake/Catch2
 DART_TESTING_TIMEOUT:STRING=1500
 
 //Enable building tests
-ENABLE_TESTS:BOOL=OFF
+ENABLE_TESTS:BOOL=ON
 
 //Path to a program.
 GITCOMMAND:FILEPATH=/usr/bin/git
@@ -226,11 +220,17 @@ MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
 //Path to a library.
 OPENTELEMETRY_API_LIB:FILEPATH=OPENTELEMETRY_API_LIB-NOTFOUND
 
+//Path to a library.
+OPENTELEMETRY_COMMON_LIB:FILEPATH=OPENTELEMETRY_COMMON_LIB-NOTFOUND
+
 //Path to a file.
 OPENTELEMETRY_INCLUDE_DIR:PATH=OPENTELEMETRY_INCLUDE_DIR-NOTFOUND
 
 //Path to a library.
 OPENTELEMETRY_OTLP_LIB:FILEPATH=OPENTELEMETRY_OTLP_LIB-NOTFOUND
+
+//Path to a library.
+OPENTELEMETRY_RESOURCES_LIB:FILEPATH=OPENTELEMETRY_RESOURCES_LIB-NOTFOUND
 
 //Path to a library.
 OPENTELEMETRY_SDK_LIB:FILEPATH=OPENTELEMETRY_SDK_LIB-NOTFOUND
@@ -278,19 +278,16 @@ RoboAdvisor_SOURCE_DIR:STATIC=/workspaces/Seven
 SITE:STRING=docker-desktop
 
 //Path to a library.
-YAMLCPP_LIB:FILEPATH=/home/vscode/local/lib/libyaml-cpp.a
+YAMLCPP_LIB:FILEPATH=/usr/lib/x86_64-linux-gnu/libyaml-cpp.so
 
 //The directory containing a CMake configuration file for fmt.
-fmt_DIR:PATH=/home/vscode/local/lib/cmake/fmt
-
-//The directory containing a CMake configuration file for opentelemetry-cpp.
-opentelemetry-cpp_DIR:PATH=opentelemetry-cpp_DIR-NOTFOUND
+fmt_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/fmt
 
 //Path to a library.
-pkgcfg_lib_YAMLCPP_yaml-cpp:FILEPATH=/home/vscode/local/lib/libyaml-cpp.a
+pkgcfg_lib_YAMLCPP_yaml-cpp:FILEPATH=/usr/lib/x86_64-linux-gnu/libyaml-cpp.so
 
 //The directory containing a CMake configuration file for spdlog.
-spdlog_DIR:PATH=/home/vscode/local/lib/cmake/spdlog
+spdlog_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/spdlog
 
 
 ########################
@@ -309,8 +306,6 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=22
 //Patch version of cmake used to create the current loaded cache
 CMAKE_CACHE_PATCH_VERSION:INTERNAL=1
-//ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
-CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
 CMAKE_COMMAND:INTERNAL=/usr/bin/cmake
 //Path to cpack program executable.
@@ -354,7 +349,7 @@ CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
 //Name of generator.
-CMAKE_GENERATOR:INTERNAL=Unix Makefiles
+CMAKE_GENERATOR:INTERNAL=Ninja
 //Generator instance identifier.
 CMAKE_GENERATOR_INSTANCE:INTERNAL=
 //Name of generator platform.
@@ -387,7 +382,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=4
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -476,32 +471,32 @@ Protobuf_PROTOC_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 Protobuf_PROTOC_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: SITE
 SITE-ADVANCED:INTERNAL=1
-YAMLCPP_CFLAGS:INTERNAL=-I/home/vscode/local/include
+YAMLCPP_CFLAGS:INTERNAL=
 YAMLCPP_CFLAGS_I:INTERNAL=
 YAMLCPP_CFLAGS_OTHER:INTERNAL=
 YAMLCPP_FOUND:INTERNAL=1
-YAMLCPP_INCLUDEDIR:INTERNAL=/home/vscode/local/include
-YAMLCPP_INCLUDE_DIRS:INTERNAL=/home/vscode/local/include
-YAMLCPP_LDFLAGS:INTERNAL=-L/home/vscode/local/lib;-lyaml-cpp
+YAMLCPP_INCLUDEDIR:INTERNAL=/usr/include
+YAMLCPP_INCLUDE_DIRS:INTERNAL=
+YAMLCPP_LDFLAGS:INTERNAL=-L/usr/lib/x86_64-linux-gnu;-lyaml-cpp
 YAMLCPP_LDFLAGS_OTHER:INTERNAL=
-YAMLCPP_LIBDIR:INTERNAL=/home/vscode/local/lib
+YAMLCPP_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
 YAMLCPP_LIBRARIES:INTERNAL=yaml-cpp
-YAMLCPP_LIBRARY_DIRS:INTERNAL=/home/vscode/local/lib
+YAMLCPP_LIBRARY_DIRS:INTERNAL=/usr/lib/x86_64-linux-gnu
 YAMLCPP_LIBS:INTERNAL=
 YAMLCPP_LIBS_L:INTERNAL=
 YAMLCPP_LIBS_OTHER:INTERNAL=
 YAMLCPP_LIBS_PATHS:INTERNAL=
 YAMLCPP_MODULE_NAME:INTERNAL=yaml-cpp
-YAMLCPP_PREFIX:INTERNAL=/home/vscode/local
-YAMLCPP_STATIC_CFLAGS:INTERNAL=-I/home/vscode/local/include
+YAMLCPP_PREFIX:INTERNAL=/usr
+YAMLCPP_STATIC_CFLAGS:INTERNAL=
 YAMLCPP_STATIC_CFLAGS_I:INTERNAL=
 YAMLCPP_STATIC_CFLAGS_OTHER:INTERNAL=
-YAMLCPP_STATIC_INCLUDE_DIRS:INTERNAL=/home/vscode/local/include
-YAMLCPP_STATIC_LDFLAGS:INTERNAL=-L/home/vscode/local/lib;-lyaml-cpp
+YAMLCPP_STATIC_INCLUDE_DIRS:INTERNAL=
+YAMLCPP_STATIC_LDFLAGS:INTERNAL=-L/usr/lib/x86_64-linux-gnu;-lyaml-cpp
 YAMLCPP_STATIC_LDFLAGS_OTHER:INTERNAL=
 YAMLCPP_STATIC_LIBDIR:INTERNAL=
 YAMLCPP_STATIC_LIBRARIES:INTERNAL=yaml-cpp
-YAMLCPP_STATIC_LIBRARY_DIRS:INTERNAL=/home/vscode/local/lib
+YAMLCPP_STATIC_LIBRARY_DIRS:INTERNAL=/usr/lib/x86_64-linux-gnu
 YAMLCPP_STATIC_LIBS:INTERNAL=
 YAMLCPP_STATIC_LIBS_L:INTERNAL=
 YAMLCPP_STATIC_LIBS_OTHER:INTERNAL=
@@ -515,5 +510,5 @@ __pkg_config_arguments_YAMLCPP:INTERNAL=yaml-cpp
 __pkg_config_checked_YAMLCPP:INTERNAL=1
 //ADVANCED property for variable: pkgcfg_lib_YAMLCPP_yaml-cpp
 pkgcfg_lib_YAMLCPP_yaml-cpp-ADVANCED:INTERNAL=1
-prefix_result:INTERNAL=/home/vscode/local/lib
+prefix_result:INTERNAL=/usr/lib/x86_64-linux-gnu
 

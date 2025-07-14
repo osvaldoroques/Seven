@@ -1,9 +1,11 @@
 #include "portfolio_manager.hpp"
 #include "messages_register.hpp"
 #include "messages.pb.h"
+#include "opentelemetry_integration.hpp"  // Add OpenTelemetry integration
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <iomanip>  // For std::setprecision
 
 int main(int argc, char* argv[]) {
     std::string config_file = "config.yaml";
@@ -13,16 +15,26 @@ int main(int argc, char* argv[]) {
         config_file = argv[1];
     }
 
-    // Set up logging level from environment
-    Logger::set_level_from_env();
+    // 🔥 Initialize OpenTelemetry before anything else
+    #ifdef HAVE_OPENTELEMETRY
+    std::string otel_endpoint = std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT") 
+        ? std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT") 
+        : "http://otel-collector:4317";
+    std::string service_name = std::getenv("OTEL_SERVICE_NAME") 
+        ? std::getenv("OTEL_SERVICE_NAME") 
+        : "portfolio_manager";
     
-    // Create main logger with tracing
-    Logger main_logger("PortfolioManager.Main");
-    main_logger.info("Starting Portfolio Manager with config: {} trace_id={} span_id={}", 
-                     config_file, main_logger.get_trace_id(), main_logger.get_span_id());
+    OpenTelemetryIntegration::initialize(service_name, otel_endpoint);
+    std::cout << "✅ OpenTelemetry initialized: " << service_name << " -> " << otel_endpoint << std::endl;
+    #else
+    std::cout << "ℹ️ OpenTelemetry not available - running without distributed tracing" << std::endl;
+    #endif
+
+    // 🚀 Performance optimization demonstration
+    std::cout << "\n🚀 Function Pointer Performance Optimization Demo\n";
+    std::cout << "================================================\n";
     
-    std::cout << "🚀 Starting Portfolio Manager with config: " << config_file << std::endl;
-    
+    // Create service host with unique ID
     PortfolioManager svc(
       PortfolioManager::ConfigFileTag{},
       "svc-portfolio-001",
@@ -138,6 +150,62 @@ int main(int argc, char* argv[]) {
     svc.init_nats(nats_url);
     svc.init_jetstream();
     
+    // 🚀 Function Pointer Performance Optimization Demo
+    std::cout << "\n🚀 Hot-Path Optimization: Function Pointer Switching Demo\n";
+    std::cout << "============================================================\n";
+    
+    // Create a sample message for testing
+    Trevor::HealthCheckRequest test_msg;
+    test_msg.set_service_name("performance_test");
+    test_msg.set_uid("test-uid-001");
+    
+    // Test 1: High-performance mode (no tracing overhead)
+    std::cout << "📊 Test 1: High-Performance Mode (Fast Functions)\n";
+    svc.disable_tracing();  // Switch to fast function pointers
+    std::cout << "   • Tracing enabled: " << (svc.is_tracing_enabled() ? "YES" : "NO") << "\n";
+    std::cout << "   • Using: publish_broadcast_fast() via function pointer\n";
+    std::cout << "   • Overhead: Zero branching, minimal CPU cycles\n";
+    
+    auto start_fast = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < 1000; ++i) {
+        svc.publish_broadcast(test_msg);  // Uses function pointer -> publish_broadcast_fast
+    }
+    auto end_fast = std::chrono::high_resolution_clock::now();
+    auto fast_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_fast - start_fast);
+    
+    std::cout << "   • 1000 messages published in: " << fast_duration.count() << "μs\n";
+    std::cout << "   • Average per message: " << (fast_duration.count() / 1000.0) << "μs\n\n";
+    
+    // Test 2: Full observability mode (with tracing)
+    std::cout << "📊 Test 2: Full Observability Mode (Traced Functions)\n";
+    svc.enable_tracing();   // Switch to traced function pointers
+    std::cout << "   • Tracing enabled: " << (svc.is_tracing_enabled() ? "YES" : "NO") << "\n";
+    std::cout << "   • Using: publish_broadcast_traced() via function pointer\n";
+    std::cout << "   • Overhead: OpenTelemetry spans, NATS headers, trace context\n";
+    
+    auto start_traced = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < 1000; ++i) {
+        svc.publish_broadcast(test_msg);  // Uses function pointer -> publish_broadcast_traced
+    }
+    auto end_traced = std::chrono::high_resolution_clock::now();
+    auto traced_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_traced - start_traced);
+    
+    std::cout << "   • 1000 messages published in: " << traced_duration.count() << "μs\n";
+    std::cout << "   • Average per message: " << (traced_duration.count() / 1000.0) << "μs\n\n";
+    
+    // Performance comparison
+    double overhead_ratio = static_cast<double>(traced_duration.count()) / fast_duration.count();
+    std::cout << "🎯 Performance Analysis:\n";
+    std::cout << "   • Tracing overhead ratio: " << std::fixed << std::setprecision(2) << overhead_ratio << "x\n";
+    std::cout << "   • Runtime switching: ZERO branching penalty!\n";
+    std::cout << "   • Hot-path optimization: Function pointers eliminate if-statements\n";
+    std::cout << "   • Dynamic control: Switch modes without recompilation\n\n";
+    
+    // Reset to traced mode for production
+    std::cout << "🔧 Setting production mode: Full observability enabled\n";
+    svc.enable_tracing();
+    std::cout << "============================================================\n\n";
+
     // Display configuration values being used with structured logging
     auto logger = svc.get_logger();
     logger->info("Portfolio Manager Configuration:");

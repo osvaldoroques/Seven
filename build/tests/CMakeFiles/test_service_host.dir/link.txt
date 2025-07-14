@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/test_service_host.dir/test_service_host.cpp.o -o test_service_host   -L/home/vscode/local/lib  -Wl,-rpath,/home/vscode/local/lib ../libs/common/libcommon.a ../libproto_files.a /usr/lib/libCatch2WithMain.a -lnats /usr/lib/x86_64-linux-gnu/libprotobuf.so /home/vscode/local/lib/libyaml-cpp.a /home/vscode/local/lib/libspdlog.a /home/vscode/local/lib/libfmt.a 

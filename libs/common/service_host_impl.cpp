@@ -1,5 +1,6 @@
 #include "service_host.hpp"
 #include "messages.pb.h"
+#include <unordered_map>  // For trace context headers
 
 // Static instance for signal handler
 ServiceHost* ServiceHost::instance_ = nullptr;
@@ -118,31 +119,242 @@ void ServiceHost::init_jetstream() {
     std::cout << "✅ JetStream initialized." << std::endl;
 }
 
-void ServiceHost::publish_broadcast(const google::protobuf::Message& message) {
-    std::lock_guard<std::mutex> lk(publish_mutex_);
+// 🚀 Hot-path function pointer optimization (zero-branching)
+
+void ServiceHost::enable_tracing() {
+    tracing_enabled_ = true;
+    publish_broadcast_impl_ = &ServiceHost::publish_broadcast_traced;
+    publish_point_to_point_impl_ = &ServiceHost::publish_point_to_point_traced;
+}
+
+void ServiceHost::disable_tracing() {
+    tracing_enabled_ = false;
+    publish_broadcast_impl_ = &ServiceHost::publish_broadcast_fast;
+    publish_point_to_point_impl_ = &ServiceHost::publish_point_to_point_fast;
+}
+
+// Hot-path method with function pointer dispatch (zero overhead)
+void ServiceHost::publish_broadcast(const google::protobuf::Message &message) {
+    (this->*publish_broadcast_impl_)(message);
+}
+
+void ServiceHost::publish_point_to_point(const std::string &target_uid, const google::protobuf::Message &message) {
+    (this->*publish_point_to_point_impl_)(target_uid, message);
+}
+
+// Non-traced implementation (maximum performance)
+void ServiceHost::publish_broadcast_fast(const google::protobuf::Message &message) {
+    std::lock_guard<std::mutex> lock(publish_mutex_);
+    
+    if (!conn_) {
+        std::cerr << "❌ NATS connection not initialized" << std::endl;
+        return;
+    }
+
+    std::string type_name = message.GetTypeName();
     std::string data;
-    message.SerializeToString(&data);
-    std::string subject = "system.broadcast." + message.GetDescriptor()->full_name();
-    status_ = natsConnection_Publish(conn_, subject.c_str(), data.data(), data.size());
-    if (status_ != NATS_OK) {
-        std::cerr << "❌ Publish broadcast failed: "
-                  << natsStatus_GetText(status_) << std::endl;
+    if (!message.SerializeToString(&data)) {
+        std::cerr << "❌ Failed to serialize message of type: " << type_name << std::endl;
+        return;
+    }
+
+    std::string subject = "broadcast." + type_name;
+    natsStatus status = natsConnection_Publish(conn_, subject.c_str(), data.c_str(), data.length());
+    if (status != NATS_OK) {
+        std::cerr << "❌ Failed to publish broadcast message: " << natsStatus_GetText(status) << std::endl;
     }
 }
 
-
-void ServiceHost::publish_point_to_point(const std::string& target_uid,
-                                         const google::protobuf::Message& message)
-{
-    std::lock_guard<std::mutex> lk(publish_mutex_);
-    std::string data;
-    message.SerializeToString(&data);
-    std::string subject = "system.direct." + target_uid + "." + message.GetDescriptor()->full_name();
-    status_ = natsConnection_Publish(conn_, subject.c_str(), data.data(), data.size());
-    if (status_ != NATS_OK) {
-        std::cerr << "❌ Publish P2P failed: "
-                  << natsStatus_GetText(status_) << std::endl;
+void ServiceHost::publish_point_to_point_fast(const std::string &target_uid, const google::protobuf::Message &message) {
+    std::lock_guard<std::mutex> lock(publish_mutex_);
+    
+    if (!conn_) {
+        std::cerr << "❌ NATS connection not initialized" << std::endl;
+        return;
     }
+
+    std::string type_name = message.GetTypeName();
+    std::string data;
+    if (!message.SerializeToString(&data)) {
+        std::cerr << "❌ Failed to serialize message of type: " << type_name << std::endl;
+        return;
+    }
+
+    std::string subject = "p2p." + target_uid + "." + type_name;
+    natsStatus status = natsConnection_Publish(conn_, subject.c_str(), data.c_str(), data.length());
+    if (status != NATS_OK) {
+        std::cerr << "❌ Failed to publish p2p message: " << natsStatus_GetText(status) << std::endl;
+    }
+}
+
+// Traced implementation (with OpenTelemetry overhead)
+void ServiceHost::publish_broadcast_traced(const google::protobuf::Message &message) {
+#ifdef HAVE_OPENTELEMETRY
+    // Create span for this operation
+    auto tracer = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("nats_service");
+    auto span = tracer->StartSpan("publish_broadcast");
+    
+    // Set span attributes
+    span->SetAttribute("message.type", message.GetTypeName());
+    span->SetAttribute("publish.mode", "broadcast");
+    span->SetAttribute("service.uid", uid_);
+#endif
+
+    std::lock_guard<std::mutex> lock(publish_mutex_);
+    
+    if (!conn_) {
+        std::cerr << "❌ NATS connection not initialized" << std::endl;
+#ifdef HAVE_OPENTELEMETRY
+        span->SetStatus(opentelemetry::trace::StatusCode::kError, "NATS connection not initialized");
+        span->End();
+#endif
+        return;
+    }
+
+    std::string type_name = message.GetTypeName();
+    std::string data;
+    if (!message.SerializeToString(&data)) {
+        std::cerr << "❌ Failed to serialize message of type: " << type_name << std::endl;
+#ifdef HAVE_OPENTELEMETRY
+        span->SetStatus(opentelemetry::trace::StatusCode::kError, "Message serialization failed");
+        span->End();
+#endif
+        return;
+    }
+
+    std::string subject = "broadcast." + type_name;
+
+#ifdef HAVE_OPENTELEMETRY
+    // Create NATS message with tracing headers
+    natsMsg *natsmsg = nullptr;
+    natsStatus status = natsMsg_Create(&natsmsg, subject.c_str(), nullptr, data.c_str(), data.length());
+    
+    if (status == NATS_OK) {
+        // Inject trace context into NATS headers
+        auto context = span->GetContext();
+        if (context.IsValid()) {
+            opentelemetry::trace::TraceId trace_id = context.trace_id();
+            opentelemetry::trace::SpanId span_id = context.span_id();
+            
+            char trace_id_hex[33];
+            char span_id_hex[17];
+            trace_id.ToLowerBase16(trace_id_hex);
+            span_id.ToLowerBase16(span_id_hex);
+            trace_id_hex[32] = '\0';
+            span_id_hex[16] = '\0';
+            
+            std::string traceparent = "00-" + std::string(trace_id_hex) + "-" + std::string(span_id_hex) + "-01";
+            
+            status = natsMsgHeader_Add(natsmsg, "traceparent", traceparent.c_str());
+            if (status != NATS_OK) {
+                std::cerr << "⚠️ Failed to add traceparent header: " << natsStatus_GetText(status) << std::endl;
+            }
+        }
+        
+        status = natsConnection_PublishMsg(conn_, natsmsg);
+        natsMsg_Destroy(natsmsg);
+    }
+    
+    if (status != NATS_OK) {
+        std::cerr << "❌ Failed to publish broadcast message: " << natsStatus_GetText(status) << std::endl;
+        span->SetStatus(opentelemetry::trace::StatusCode::kError, natsStatus_GetText(status));
+    } else {
+        span->SetStatus(opentelemetry::trace::StatusCode::kOk);
+    }
+    
+    span->End();
+#else
+    // Fallback to simple publish without tracing
+    natsStatus status = natsConnection_Publish(conn_, subject.c_str(), data.c_str(), data.length());
+    if (status != NATS_OK) {
+        std::cerr << "❌ Failed to publish broadcast message: " << natsStatus_GetText(status) << std::endl;
+    }
+#endif
+}
+
+void ServiceHost::publish_point_to_point_traced(const std::string &target_uid, const google::protobuf::Message &message) {
+#ifdef HAVE_OPENTELEMETRY
+    // Create span for this operation
+    auto tracer = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("nats_service");
+    auto span = tracer->StartSpan("publish_point_to_point");
+    
+    // Set span attributes
+    span->SetAttribute("message.type", message.GetTypeName());
+    span->SetAttribute("publish.mode", "point_to_point");
+    span->SetAttribute("target.uid", target_uid);
+    span->SetAttribute("service.uid", uid_);
+#endif
+
+    std::lock_guard<std::mutex> lock(publish_mutex_);
+    
+    if (!conn_) {
+        std::cerr << "❌ NATS connection not initialized" << std::endl;
+#ifdef HAVE_OPENTELEMETRY
+        span->SetStatus(opentelemetry::trace::StatusCode::kError, "NATS connection not initialized");
+        span->End();
+#endif
+        return;
+    }
+
+    std::string type_name = message.GetTypeName();
+    std::string data;
+    if (!message.SerializeToString(&data)) {
+        std::cerr << "❌ Failed to serialize message of type: " << type_name << std::endl;
+#ifdef HAVE_OPENTELEMETRY
+        span->SetStatus(opentelemetry::trace::StatusCode::kError, "Message serialization failed");
+        span->End();
+#endif
+        return;
+    }
+
+    std::string subject = "p2p." + target_uid + "." + type_name;
+
+#ifdef HAVE_OPENTELEMETRY
+    // Create NATS message with tracing headers
+    natsMsg *natsmsg = nullptr;
+    natsStatus status = natsMsg_Create(&natsmsg, subject.c_str(), nullptr, data.c_str(), data.length());
+    
+    if (status == NATS_OK) {
+        // Inject trace context into NATS headers
+        auto context = span->GetContext();
+        if (context.IsValid()) {
+            opentelemetry::trace::TraceId trace_id = context.trace_id();
+            opentelemetry::trace::SpanId span_id = context.span_id();
+            
+            char trace_id_hex[33];
+            char span_id_hex[17];
+            trace_id.ToLowerBase16(trace_id_hex);
+            span_id.ToLowerBase16(span_id_hex);
+            trace_id_hex[32] = '\0';
+            span_id_hex[16] = '\0';
+            
+            std::string traceparent = "00-" + std::string(trace_id_hex) + "-" + std::string(span_id_hex) + "-01";
+            
+            status = natsMsgHeader_Add(natsmsg, "traceparent", traceparent.c_str());
+            if (status != NATS_OK) {
+                std::cerr << "⚠️ Failed to add traceparent header: " << natsStatus_GetText(status) << std::endl;
+            }
+        }
+        
+        status = natsConnection_PublishMsg(conn_, natsmsg);
+        natsMsg_Destroy(natsmsg);
+    }
+    
+    if (status != NATS_OK) {
+        std::cerr << "❌ Failed to publish p2p message: " << natsStatus_GetText(status) << std::endl;
+        span->SetStatus(opentelemetry::trace::StatusCode::kError, natsStatus_GetText(status));
+    } else {
+        span->SetStatus(opentelemetry::trace::StatusCode::kOk);
+    }
+    
+    span->End();
+#else
+    // Fallback to simple publish without tracing
+    natsStatus status = natsConnection_Publish(conn_, subject.c_str(), data.c_str(), data.length());
+    if (status != NATS_OK) {
+        std::cerr << "❌ Failed to publish p2p message: " << natsStatus_GetText(status) << std::endl;
+    }
+#endif
 }
 
 void ServiceHost::subscribe_broadcast(const std::string& type_name) {
@@ -188,6 +400,106 @@ void ServiceHost::subscribe_point_to_point(const std::string& type_name) {
         std::cout << "📡 Subscribed to point-to-point: " << subject << std::endl;
     } else {
         std::cerr << "❌ Failed to subscribe: " << natsStatus_GetText(status_) << std::endl;
+    }
+}
+
+void ServiceHost::subscribe_broadcast_V2(const std::string& type_name) {
+    std::string subject = "system.broadcast." + type_name;
+    natsSubscription* sub = nullptr;
+
+    status_ = natsConnection_Subscribe(&sub, conn_, subject.c_str(),
+        [](natsConnection*, natsSubscription*, natsMsg* msg, void* closure) {
+            auto* self = static_cast<ServiceHost*>(closure);
+            
+            // 1️⃣ Extract trace context from NATS headers
+            std::unordered_map<std::string, std::string> headers;
+            #ifdef HAVE_OPENTELEMETRY
+            if (msg->hdr && msg->hdr->count > 0) {
+                for (int i = 0; i < msg->hdr->count; ++i) {
+                    if (msg->hdr->keys[i] && msg->hdr->values[i]) {
+                        headers[msg->hdr->keys[i]] = msg->hdr->values[i];
+                    }
+                }
+            }
+            auto parent_context = OpenTelemetryIntegration::extract_trace_context(headers);
+            #endif
+            
+            // 2️⃣ Start child span for receiving
+            std::string subj(natsMsg_GetSubject(msg));
+            std::string prefix = "system.broadcast.";
+            std::string type_name = subj.substr(prefix.size());
+            
+            #ifdef HAVE_OPENTELEMETRY
+            auto span = OpenTelemetryIntegration::start_span(
+                "receive:" + type_name, parent_context);
+            #endif
+            
+            // 3️⃣ Process the message
+            std::string payload(natsMsg_GetData(msg), natsMsg_GetDataLength(msg));
+            self->receive_message(type_name, payload);
+            
+            // 4️⃣ End span
+            #ifdef HAVE_OPENTELEMETRY
+            OpenTelemetryIntegration::end_span(span);
+            #endif
+            
+            natsMsg_Destroy(msg);
+        }, this);
+
+    if (status_ == NATS_OK)
+        std::cout << "📡 Subscribed to broadcast V2 (with tracing): " << subject << std::endl;
+    else
+        std::cerr << "❌ Failed to subscribe broadcast V2: "
+                  << natsStatus_GetText(status_) << std::endl;
+}
+
+void ServiceHost::subscribe_point_to_point_V2(const std::string& type_name) {
+    const std::string subject = "system.direct." + uid_ + "." + type_name;
+    natsSubscription* sub = nullptr;
+
+    status_ = natsConnection_Subscribe(&sub, conn_, subject.c_str(),
+        [](natsConnection*, natsSubscription*, natsMsg* msg, void* closure) {
+            auto* self = static_cast<ServiceHost*>(closure);
+            
+            // 1️⃣ Extract trace context from NATS headers
+            std::unordered_map<std::string, std::string> headers;
+            #ifdef HAVE_OPENTELEMETRY
+            if (msg->hdr && msg->hdr->count > 0) {
+                for (int i = 0; i < msg->hdr->count; ++i) {
+                    if (msg->hdr->keys[i] && msg->hdr->values[i]) {
+                        headers[msg->hdr->keys[i]] = msg->hdr->values[i];
+                    }
+                }
+            }
+            auto parent_context = OpenTelemetryIntegration::extract_trace_context(headers);
+            #endif
+            
+            // 2️⃣ Start child span for receiving
+            std::string subject_str = natsMsg_GetSubject(msg);
+            std::string prefix = "system.direct." + self->uid_ + ".";
+            std::string extracted_type_name = subject_str.substr(prefix.length());
+            
+            #ifdef HAVE_OPENTELEMETRY
+            auto span = OpenTelemetryIntegration::start_span(
+                "receive:" + extracted_type_name, parent_context);
+            #endif
+            
+            // 3️⃣ Process the message
+            std::string payload(natsMsg_GetData(msg), natsMsg_GetDataLength(msg));
+            self->receive_message(extracted_type_name, payload);
+            
+            // 4️⃣ End span
+            #ifdef HAVE_OPENTELEMETRY
+            OpenTelemetryIntegration::end_span(span);
+            #endif
+            
+            natsMsg_Destroy(msg);
+        }, this);
+
+    if (status_ == NATS_OK) {
+        std::cout << "📡 Subscribed to point-to-point V2 (with tracing): " << subject << std::endl;
+    } else {
+        std::cerr << "❌ Failed to subscribe V2: " << natsStatus_GetText(status_) << std::endl;
     }
 }
 
