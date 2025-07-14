@@ -6,6 +6,59 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Sanitizer options (enabled in Debug builds by default)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+option(ENABLE_UBSAN "Enable UndefinedBehaviorSanitizer" OFF)
+option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
+option(ENABLE_MSAN "Enable MemorySanitizer" OFF)
+
+# Auto-enable sanitizers in Debug mode (can be overridden)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT DEFINED ENABLE_ASAN AND NOT DEFINED ENABLE_UBSAN)
+    set(ENABLE_ASAN ON)
+    set(ENABLE_UBSAN ON)
+    message(STATUS "Debug build detected - enabling AddressSanitizer and UBSan by default")
+endif()
+
+# Configure sanitizer flags
+set(SANITIZER_FLAGS "")
+set(SANITIZER_LINK_FLAGS "")
+
+if(ENABLE_ASAN)
+    message(STATUS "AddressSanitizer enabled")
+    list(APPEND SANITIZER_FLAGS "-fsanitize=address" "-fno-omit-frame-pointer")
+    list(APPEND SANITIZER_LINK_FLAGS "-fsanitize=address")
+endif()
+
+if(ENABLE_UBSAN)
+    message(STATUS "UndefinedBehaviorSanitizer enabled")
+    list(APPEND SANITIZER_FLAGS "-fsanitize=undefined" "-fno-sanitize-recover=undefined")
+    list(APPEND SANITIZER_LINK_FLAGS "-fsanitize=undefined")
+endif()
+
+if(ENABLE_TSAN)
+    message(STATUS "ThreadSanitizer enabled")
+    list(APPEND SANITIZER_FLAGS "-fsanitize=thread" "-fno-omit-frame-pointer")
+    list(APPEND SANITIZER_LINK_FLAGS "-fsanitize=thread")
+endif()
+
+if(ENABLE_MSAN)
+    message(STATUS "MemorySanitizer enabled")
+    list(APPEND SANITIZER_FLAGS "-fsanitize=memory" "-fno-omit-frame-pointer")
+    list(APPEND SANITIZER_LINK_FLAGS "-fsanitize=memory")
+endif()
+
+# Apply sanitizer flags globally
+if(SANITIZER_FLAGS)
+    string(REPLACE ";" " " SANITIZER_FLAGS_STR "${SANITIZER_FLAGS}")
+    string(REPLACE ";" " " SANITIZER_LINK_FLAGS_STR "${SANITIZER_LINK_FLAGS}")
+    
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZER_FLAGS_STR}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SANITIZER_LINK_FLAGS_STR}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SANITIZER_LINK_FLAGS_STR}")
+    
+    message(STATUS "Sanitizer flags applied: ${SANITIZER_FLAGS_STR}")
+endif()
+
 # Enable testing
 include(CTest)
 

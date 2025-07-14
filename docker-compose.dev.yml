@@ -1,0 +1,57 @@
+# Docker Compose override for development with sanitizers
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  portfolio_manager:
+    build:
+      target: development
+      args:
+        ENABLE_ASAN: "ON"
+        ENABLE_UBSAN: "ON"
+        ENABLE_TSAN: "OFF"
+        BUILD_TYPE: "Debug"
+    container_name: seven-portfolio-manager-dev
+    environment:
+      # Sanitizer configuration
+      - ASAN_OPTIONS=verbosity=1:abort_on_error=1:check_initialization_order=1:detect_leaks=1
+      - UBSAN_OPTIONS=print_stacktrace=1:abort_on_error=1
+      - MSAN_OPTIONS=print_stats=1:abort_on_error=1
+      # Development settings
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=portfolio_manager_dev
+      - SKIP_PERFORMANCE_DEMO=false
+    # Increased memory for sanitizers
+    mem_limit: 2g
+    # Enable core dumps for debugging
+    ulimits:
+      core: -1
+    volumes:
+      # Mount source code for development
+      - ./:/app/src:ro
+      # Mount core dumps
+      - ./debug:/app/debug
+    # More verbose logging
+    command: ["./portfolio_manager_debug", "config.yaml"]
+    
+  # Thread sanitizer variant (separate service since TSan conflicts with ASan)
+  portfolio_manager_tsan:
+    build:
+      target: development
+      args:
+        ENABLE_ASAN: "OFF"
+        ENABLE_UBSAN: "OFF"  
+        ENABLE_TSAN: "ON"
+        BUILD_TYPE: "Debug"
+    container_name: seven-portfolio-manager-tsan
+    environment:
+      - TSAN_OPTIONS=verbosity=1:abort_on_error=1:halt_on_error=1
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=portfolio_manager_tsan
+    profiles:
+      - tsan
+    mem_limit: 4g  # TSan needs more memory
+    depends_on:
+      nats:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started

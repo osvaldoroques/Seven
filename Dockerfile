@@ -157,3 +157,39 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD ps aux | grep portfolio_manager | grep -v grep || exit 1
 
 CMD ["./portfolio_manager", "config.yaml"]
+
+# Development stage with sanitizers
+FROM builder AS development
+
+# Set build arguments for sanitizers
+ARG ENABLE_ASAN=ON
+ARG ENABLE_UBSAN=ON
+ARG ENABLE_TSAN=OFF
+ARG BUILD_TYPE=Debug
+
+WORKDIR /app
+
+# Build with sanitizers for development
+RUN cd build && \
+    cmake .. \
+        -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+        -DENABLE_ASAN=${ENABLE_ASAN} \
+        -DENABLE_UBSAN=${ENABLE_UBSAN} \
+        -DENABLE_TSAN=${ENABLE_TSAN} \
+        -DENABLE_TESTS=OFF && \
+    make -j$(nproc)
+
+# Set up sanitizer environment
+ENV ASAN_OPTIONS="verbosity=1:abort_on_error=1:check_initialization_order=1:detect_leaks=1"
+ENV UBSAN_OPTIONS="print_stacktrace=1:abort_on_error=1"
+ENV TSAN_OPTIONS="verbosity=1:abort_on_error=1:halt_on_error=1"
+
+# Copy development build
+COPY --from=development /app/build/services/portfolio_manager/portfolio_manager ./portfolio_manager_debug
+COPY --from=development /app/config.yaml .
+
+# Development healthcheck (more verbose)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \
+    CMD ps aux | grep portfolio_manager | grep -v grep || exit 1
+
+CMD ["./portfolio_manager_debug", "config.yaml"]
