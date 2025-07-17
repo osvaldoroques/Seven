@@ -1,0 +1,51 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://otel-collector:8888
+    isDefault: true
+    jsonData:
+      timeInterval: 5s
+      httpMethod: POST
+    editable: true
+    
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    isDefault: false
+    jsonData:
+      tracesToLogsV2:
+        # Field with an internal link pointing to a logs data source in Grafana.
+        # datasourceUid value must match the datasourceUid value of the logs data source.
+        datasourceUid: 'loki'
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        filterByTraceID: false
+        filterBySpanID: false
+        customQuery: true
+        query: '{job="varlogs"} |= "$${__span.traceId}"'
+      tracesToMetrics:
+        datasourceUid: 'prometheus'
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
+        queries:
+          - name: 'Sample query'
+            query: 'sum(rate(traces_spanmetrics_latency_bucket{service="$${service}"}[5m]))'
+      nodeGraph:
+        enabled: true
+    editable: true
+
+  - name: Seven Portfolio Manager
+    type: prometheus
+    access: proxy
+    url: http://portfolio_manager:9090
+    isDefault: false
+    jsonData:
+      timeInterval: 5s
+      httpMethod: GET
+    editable: true

@@ -97,6 +97,11 @@ public:
         std::unique_lock<std::mutex> lk(mtx);
         return tasks.size();
     }
+    
+    size_t active_threads() const {
+        // Return number of worker threads (all threads are considered active)
+        return workers.size();
+    }
 
 private:
     // Worker loop: waits for tasks or shutdown signal.

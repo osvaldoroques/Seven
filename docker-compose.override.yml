@@ -1,0 +1,65 @@
+# Development override for docker-compose.yml
+# Run with: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+version: '3.8'
+
+services:
+  grafana:
+    environment:
+      - GF_LOG_LEVEL=debug
+      - GF_EXPLORE_ENABLED=true
+      - GF_ALERTING_ENABLED=true
+      - GF_UNIFIED_ALERTING_ENABLED=true
+    volumes:
+      - ./config/grafana/plugins:/var/lib/grafana/plugins
+    ports:
+      - "3000:3000"
+    
+  portfolio_manager:
+    environment:
+      - SPDLOG_LEVEL=debug
+      - ENABLE_METRICS=true
+      - METRICS_PORT=9090
+    # Enable privileged mode for better debugging
+    privileged: false
+    # Mount source code for development
+    volumes:
+      - .:/workspace:cached
+    
+  otel-collector:
+    environment:
+      - OTEL_LOG_LEVEL=debug
+    
+  jaeger:
+    environment:
+      - JAEGER_DISABLED=false
+      - LOG_LEVEL=debug
+      
+  # Optional: Add Redis for caching in development
+  redis:
+    image: redis:7-alpine
+    container_name: seven-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - seven-network
+    restart: unless-stopped
+    
+  # Optional: Add PostgreSQL for development database
+  postgres:
+    image: postgres:15-alpine
+    container_name: seven-postgres
+    environment:
+      - POSTGRES_DB=seven_dev
+      - POSTGRES_USER=seven
+      - POSTGRES_PASSWORD=seven_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - seven-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

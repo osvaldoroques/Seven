@@ -44,24 +44,38 @@ public:
     
     // 🚀 NEW: Complete service startup after infrastructure is ready
     void complete_startup(std::future<void>&& infrastructure_future) {
-        // Wait for infrastructure to be ready
-        infrastructure_future.get();
-        
-        // Setup message handlers now that infrastructure is ready
-        _setup_handlers();
-        
-        // Complete the service startup with simplified config
+        try {
+            // Wait for infrastructure to be ready
+            infrastructure_future.get();
+            
+            // Setup message handlers now that infrastructure is ready
+            _setup_handlers();
+                 // Complete the service startup with simplified config
         auto config = ServiceHost::create_production_config();
         config.enable_cache = true;
         config.default_cache_size = 5000;
         config.default_cache_ttl = std::chrono::hours(2);
         
+        // Re-enable Prometheus metrics now that we have Grafana setup
+        config.enable_prometheus_metrics = true;
+        config.enable_metrics_server = true;
+        config.prometheus_metrics_port = 9090;  // Use port 9090 for consistency
+        
+        // Re-enable permanent tasks for system monitoring
+        config.enable_permanent_tasks = true;
+        
         // Note: ServiceHost permanent tasks handle all maintenance automatically
         // No need for custom callbacks - cleaner and more consistent!
-        
-        service_host_->CompleteServiceStartup(config);
-        
-        std::cout << "🚀 PortfolioManager startup completed successfully" << std::endl;
+            
+            // Wait for the service startup to complete
+            auto startup_future = service_host_->CompleteServiceStartup(config);
+            startup_future.get();  // Wait for completion
+            
+            std::cout << "🚀 PortfolioManager startup completed successfully" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "❌ Error during startup completion: " << e.what() << std::endl;
+            throw;
+        }
     }
     
     // 🚀 NEW: Start with parallel initialization

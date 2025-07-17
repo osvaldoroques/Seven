@@ -1,5 +1,26 @@
 
 services:
+  # Grafana for observability dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: seven-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - otel-collector
+    networks:
+      - seven-network
+    restart: unless-stopped
+
   # OpenTelemetry Collector
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -13,6 +34,8 @@ services:
       - "8888:8888"   # Prometheus metrics
     depends_on:
       - jaeger
+    networks:
+      - seven-network
 
   # Jaeger (latest stable)
   jaeger:
@@ -24,6 +47,8 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - JAEGER_DISABLED=false
+    networks:
+      - seven-network
 
   nats:
     image: nats:latest
@@ -38,6 +63,8 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
+    networks:
+      - seven-network
 
   portfolio_manager:
     build:
@@ -58,6 +85,9 @@ services:
       - SPDLOG_LEVEL=info
     ports:
       - "8080:8080"
+      - "9090:9090"  # Prometheus metrics endpoint
+    networks:
+      - seven-network
 
   python_client:
     build:
@@ -74,3 +104,15 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_SERVICE_NAME=python_client
       - OTEL_RESOURCE_ATTRIBUTES=service.name=python_client,service.version=1.0.0
+    networks:
+      - seven-network
+
+# Define volumes for persistent data
+volumes:
+  grafana_data:
+    driver: local
+
+# Define networks
+networks:
+  seven-network:
+    driver: bridge

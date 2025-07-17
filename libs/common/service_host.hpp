@@ -22,6 +22,8 @@
 #include "configuration.hpp"
 #include "service_cache.hpp"
 #include "service_scheduler.hpp"
+#include "prometheus_metrics.hpp"
+#include "metrics_server.hpp"
 
 // Forward declaration
 class ServiceCache;
@@ -79,6 +81,19 @@ struct ServiceInitConfig {
     size_t automatic_backpressure_threshold = 100;  // Queue size threshold for backpressure
     double health_check_cpu_threshold = 0.8;        // CPU threshold for health warnings
     size_t health_check_memory_threshold = 1024 * 1024 * 1024;  // 1GB memory threshold
+    
+    // 🚀 NEW: Prometheus Metrics Configuration
+    bool enable_prometheus_metrics = true;      // Enable Prometheus metrics collection
+    int prometheus_metrics_port = 8080;         // Port for /metrics endpoint
+    bool enable_metrics_server = true;          // Enable built-in HTTP server for metrics
+    std::string metrics_path = "/metrics";      // Path for metrics endpoint
+    
+    // Standard ServiceHost metrics (always enabled when prometheus is enabled)
+    bool collect_message_metrics = true;        // Message send/receive counters
+    bool collect_handler_latency = true;        // Handler execution time histograms
+    bool collect_system_metrics = true;         // CPU, memory, thread pool metrics
+    bool collect_nats_metrics = true;           // NATS connection metrics
+    bool collect_cache_metrics = true;          // Cache hit/miss metrics
 };
 
 enum class MessageRouting
@@ -286,6 +301,44 @@ public:
         return scheduler_->schedule_once(name, delay, std::move(task));
     }
 
+    // 🚀 PROMETHEUS METRICS SYSTEM 🚀
+    // Built-in metrics collection and /metrics endpoint for all services
+    
+    // Get pre-configured ServiceHost metrics
+    std::shared_ptr<PrometheusMetrics::Counter> get_messages_sent_counter() { return messages_sent_total_; }
+    std::shared_ptr<PrometheusMetrics::Counter> get_messages_received_counter() { return messages_received_total_; }
+    std::shared_ptr<PrometheusMetrics::Histogram> get_handler_duration_histogram() { return message_handler_duration_; }
+    std::shared_ptr<PrometheusMetrics::Histogram> get_publish_duration_histogram() { return message_publish_duration_; }
+    std::shared_ptr<PrometheusMetrics::Gauge> get_system_cpu_gauge() { return system_cpu_usage_; }
+    std::shared_ptr<PrometheusMetrics::Gauge> get_system_memory_gauge() { return system_memory_usage_; }
+    std::shared_ptr<PrometheusMetrics::Counter> get_cache_hits_counter() { return cache_hits_total_; }
+    std::shared_ptr<PrometheusMetrics::Counter> get_cache_misses_counter() { return cache_misses_total_; }
+    
+    // Create custom metrics for business logic
+    std::shared_ptr<PrometheusMetrics::Counter> create_counter(const std::string& name, const std::string& help,
+                                                              const std::unordered_map<std::string, std::string>& labels = {}) {
+        return PrometheusMetrics::MetricsRegistry::instance().create_counter(name, help, labels);
+    }
+    
+    std::shared_ptr<PrometheusMetrics::Gauge> create_gauge(const std::string& name, const std::string& help,
+                                                          const std::unordered_map<std::string, std::string>& labels = {}) {
+        return PrometheusMetrics::MetricsRegistry::instance().create_gauge(name, help, labels);
+    }
+    
+    std::shared_ptr<PrometheusMetrics::Histogram> create_histogram(const std::string& name, const std::string& help,
+                                                                  const std::vector<double>& buckets = {0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0},
+                                                                  const std::unordered_map<std::string, std::string>& labels = {}) {
+        return PrometheusMetrics::MetricsRegistry::instance().create_histogram(name, help, buckets, labels);
+    }
+    
+    // Get metrics output in Prometheus format
+    std::string get_prometheus_metrics() {
+        return get_metrics_output();
+    }
+    
+    // Get metrics server port (useful for health checks)
+    int get_metrics_port() const;
+
     // 🚀 COMPREHENSIVE SERVICE INITIALIZATION 🚀
     // One-stop initialization for all service functionalities
     void initialize_service(const ServiceInitConfig& config = {});
@@ -342,6 +395,16 @@ public:
         config.enable_automatic_health_status = true;
         config.enable_automatic_backpressure_check = true;
         config.automatic_backpressure_threshold = 200;
+        
+        // Enable Prometheus metrics by default in production
+        config.enable_prometheus_metrics = true;
+        config.prometheus_metrics_port = 8080;
+        config.enable_metrics_server = true;
+        config.collect_message_metrics = true;
+        config.collect_handler_latency = true;
+        config.collect_system_metrics = true;
+        config.collect_nats_metrics = true;
+        config.collect_cache_metrics = true;
         
         return config;
     }
@@ -622,6 +685,30 @@ private:
     double get_cpu_usage_percentage();
     size_t get_memory_usage_bytes();
     size_t get_current_queue_size();
+    
+    // 🚀 NEW: Prometheus Metrics System
+    std::unique_ptr<PrometheusMetrics::MetricsServer> metrics_server_;
+    
+    // Core ServiceHost metrics
+    std::shared_ptr<PrometheusMetrics::Counter> messages_sent_total_;
+    std::shared_ptr<PrometheusMetrics::Counter> messages_received_total_;
+    std::shared_ptr<PrometheusMetrics::Histogram> message_handler_duration_;
+    std::shared_ptr<PrometheusMetrics::Histogram> message_publish_duration_;
+    std::shared_ptr<PrometheusMetrics::Gauge> active_connections_;
+    std::shared_ptr<PrometheusMetrics::Gauge> thread_pool_active_threads_;
+    std::shared_ptr<PrometheusMetrics::Gauge> thread_pool_queue_size_;
+    std::shared_ptr<PrometheusMetrics::Gauge> system_cpu_usage_;
+    std::shared_ptr<PrometheusMetrics::Gauge> system_memory_usage_;
+    std::shared_ptr<PrometheusMetrics::Counter> cache_hits_total_;
+    std::shared_ptr<PrometheusMetrics::Counter> cache_misses_total_;
+    std::shared_ptr<PrometheusMetrics::Gauge> cache_size_;
+    
+    // Metrics initialization and collection
+    void init_prometheus_metrics(const ServiceInitConfig& config);
+    void start_metrics_server(int port);
+    void stop_metrics_server();
+    void update_system_metrics();
+    std::string get_metrics_output();
 
 public:
     static ServiceHost *instance_; // For signal handler access (public)

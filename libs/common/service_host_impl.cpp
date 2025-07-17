@@ -33,6 +33,9 @@ void ServiceHost::shutdown() {
     // Stop permanent maintenance tasks
     StopPermanentTasks();
     
+    // Stop Prometheus metrics server
+    stop_metrics_server();
+    
     // Stop configuration watching
     try {
         config_.stopWatch();
@@ -171,6 +174,9 @@ void ServiceHost::publish_point_to_point(const std::string &target_uid, const go
 
 // Non-traced implementation (maximum performance)
 void ServiceHost::publish_broadcast_fast(const google::protobuf::Message &message) {
+    // Metrics timing
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
     std::lock_guard<std::mutex> lock(publish_mutex_);
     
     if (!conn_) {
@@ -189,10 +195,24 @@ void ServiceHost::publish_broadcast_fast(const google::protobuf::Message &messag
     natsStatus status = natsConnection_Publish(conn_, subject.c_str(), data.c_str(), data.length());
     if (status != NATS_OK) {
         std::cerr << "❌ Failed to publish broadcast message: " << natsStatus_GetText(status) << std::endl;
+    } else {
+        // Update metrics on success
+        if (messages_sent_total_) {
+            messages_sent_total_->inc();
+        }
+        
+        if (message_publish_duration_) {
+            auto end_time = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+            message_publish_duration_->observe(duration.count() / 1000000.0);
+        }
     }
 }
 
 void ServiceHost::publish_point_to_point_fast(const std::string &target_uid, const google::protobuf::Message &message) {
+    // Metrics timing
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
     std::lock_guard<std::mutex> lock(publish_mutex_);
     
     if (!conn_) {
@@ -211,6 +231,17 @@ void ServiceHost::publish_point_to_point_fast(const std::string &target_uid, con
     natsStatus status = natsConnection_Publish(conn_, subject.c_str(), data.c_str(), data.length());
     if (status != NATS_OK) {
         std::cerr << "❌ Failed to publish p2p message: " << natsStatus_GetText(status) << std::endl;
+    } else {
+        // Update metrics on success
+        if (messages_sent_total_) {
+            messages_sent_total_->inc();
+        }
+        
+        if (message_publish_duration_) {
+            auto end_time = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+            message_publish_duration_->observe(duration.count() / 1000000.0);
+        }
     }
 }
 
@@ -929,7 +960,17 @@ void ServiceHost::initialize_service(const ServiceInitConfig& config) {
         init_cache_system();
     }
     
-    // 4️⃣ Final Health Check
+    // 4️⃣ Initialize Prometheus Metrics System
+    if (config.enable_prometheus_metrics) {
+        logger_->info("📊 Initializing Prometheus metrics system (port: {})", config.prometheus_metrics_port);
+        init_prometheus_metrics(config);
+        
+        if (config.enable_metrics_server) {
+            start_metrics_server(config.prometheus_metrics_port);
+        }
+    }
+    
+    // 5️⃣ Final Health Check
     if (is_healthy()) {
         logger_->info("✅ Core service initialization completed successfully");
         logger_->info("🎯 Service Status: {}", get_status());
@@ -1002,9 +1043,27 @@ void ServiceHost::register_handler(const std::string& message_type,
                     
                     auto it = host->handlers_.find(msg_type);
                     if (it != host->handlers_.end()) {
-                        // Execute handler in thread pool
-                        host->thread_pool_.submit([handler = it->second, payload]() {
-                            handler(payload);
+                        // Update received messages counter
+                        if (host->messages_received_total_) {
+                            host->messages_received_total_->inc();
+                        }
+                        
+                        // Execute handler in thread pool with metrics timing
+                        host->thread_pool_.submit([handler = it->second, payload, host]() {
+                            auto start_time = std::chrono::high_resolution_clock::now();
+                            
+                            try {
+                                handler(payload);
+                            } catch (const std::exception& e) {
+                                // Handler already logs errors, just update metrics if needed
+                            }
+                            
+                            // Update handler duration metrics
+                            if (host->message_handler_duration_) {
+                                auto end_time = std::chrono::high_resolution_clock::now();
+                                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+                                host->message_handler_duration_->observe(duration.count() / 1000000.0);
+                            }
                         });
                     }
                 }
@@ -1035,9 +1094,27 @@ void ServiceHost::register_handler(const std::string& message_type,
                 
                 auto it = host->handlers_.find(msg_type);
                 if (it != host->handlers_.end()) {
-                    // Execute handler in thread pool
-                    host->thread_pool_.submit([handler = it->second, payload]() {
-                        handler(payload);
+                    // Update received messages counter
+                    if (host->messages_received_total_) {
+                        host->messages_received_total_->inc();
+                    }
+                    
+                    // Execute handler in thread pool with metrics timing
+                    host->thread_pool_.submit([handler = it->second, payload, host]() {
+                        auto start_time = std::chrono::high_resolution_clock::now();
+                        
+                        try {
+                            handler(payload);
+                        } catch (const std::exception& e) {
+                            // Handler already logs errors, just update metrics if needed
+                        }
+                        
+                        // Update handler duration metrics
+                        if (host->message_handler_duration_) {
+                            auto end_time = std::chrono::high_resolution_clock::now();
+                            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+                            host->message_handler_duration_->observe(duration.count() / 1000000.0);
+                        }
                     });
                 }
                 
@@ -1286,6 +1363,207 @@ size_t ServiceHost::get_memory_usage_bytes() {
         logger_->trace("Memory usage calculation failed: {}", e.what());
         return 0;
     }
+}
+
+// 🚀 PROMETHEUS METRICS IMPLEMENTATION 🚀
+
+void ServiceHost::init_prometheus_metrics(const ServiceInitConfig& config) {
+    try {
+        // Initialize metrics registry
+        auto& registry = PrometheusMetrics::MetricsRegistry::instance();
+        
+        // Service labels
+        std::unordered_map<std::string, std::string> service_labels = {
+            {"service", service_name_},
+            {"instance", uid_}
+        };
+        
+        // Core message metrics
+        if (config.collect_message_metrics) {
+            messages_sent_total_ = registry.create_counter(
+                "servicehost_messages_sent_total",
+                "Total number of messages sent by this service",
+                service_labels
+            );
+            
+            messages_received_total_ = registry.create_counter(
+                "servicehost_messages_received_total", 
+                "Total number of messages received by this service",
+                service_labels
+            );
+        }
+        
+        // Handler latency metrics
+        if (config.collect_handler_latency) {
+            message_handler_duration_ = registry.create_histogram(
+                "servicehost_message_handler_duration_seconds",
+                "Time spent processing messages in seconds",
+                {0.0001, 0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0},
+                service_labels
+            );
+            
+            message_publish_duration_ = registry.create_histogram(
+                "servicehost_message_publish_duration_seconds",
+                "Time spent publishing messages in seconds", 
+                {0.0001, 0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0},
+                service_labels
+            );
+        }
+        
+        // System metrics
+        if (config.collect_system_metrics) {
+            system_cpu_usage_ = registry.create_gauge(
+                "servicehost_system_cpu_usage_percent",
+                "CPU usage percentage for this service",
+                service_labels
+            );
+            
+            system_memory_usage_ = registry.create_gauge(
+                "servicehost_system_memory_usage_bytes",
+                "Memory usage in bytes for this service",
+                service_labels
+            );
+            
+            thread_pool_active_threads_ = registry.create_gauge(
+                "servicehost_thread_pool_active_threads",
+                "Number of active threads in the thread pool",
+                service_labels
+            );
+            
+            thread_pool_queue_size_ = registry.create_gauge(
+                "servicehost_thread_pool_queue_size",
+                "Number of tasks in the thread pool queue",
+                service_labels
+            );
+        }
+        
+        // NATS metrics
+        if (config.collect_nats_metrics) {
+            active_connections_ = registry.create_gauge(
+                "servicehost_nats_active_connections",
+                "Number of active NATS connections",
+                service_labels
+            );
+        }
+        
+        // Cache metrics
+        if (config.collect_cache_metrics && config.enable_cache) {
+            cache_hits_total_ = registry.create_counter(
+                "servicehost_cache_hits_total",
+                "Total number of cache hits",
+                service_labels
+            );
+            
+            cache_misses_total_ = registry.create_counter(
+                "servicehost_cache_misses_total",
+                "Total number of cache misses",
+                service_labels
+            );
+            
+            cache_size_ = registry.create_gauge(
+                "servicehost_cache_size_items",
+                "Number of items currently in cache",
+                service_labels
+            );
+        }
+        
+        // Start periodic metrics update
+        schedule_interval("metrics_update", std::chrono::seconds(5), [this]() {
+            update_system_metrics();
+        });
+        
+        logger_->info("✅ Prometheus metrics initialized successfully");
+        
+    } catch (const std::exception& e) {
+        logger_->error("❌ Failed to initialize Prometheus metrics: {}", e.what());
+        throw;
+    }
+}
+
+void ServiceHost::start_metrics_server(int port) {
+    try {
+        metrics_server_ = std::make_unique<PrometheusMetrics::MetricsServer>(port);
+        
+        // Set the metrics handler
+        metrics_server_->set_metrics_handler([this]() {
+            return get_metrics_output();
+        });
+        
+        metrics_server_->start();
+        logger_->info("✅ Prometheus metrics server started on port {}", port);
+        
+    } catch (const std::exception& e) {
+        logger_->error("❌ Failed to start metrics server: {}", e.what());
+        throw;
+    }
+}
+
+void ServiceHost::stop_metrics_server() {
+    if (metrics_server_) {
+        metrics_server_->stop();
+        metrics_server_.reset();
+        logger_->info("✅ Prometheus metrics server stopped");
+    }
+}
+
+void ServiceHost::update_system_metrics() {
+    try {
+        // Update CPU usage
+        if (system_cpu_usage_) {
+            system_cpu_usage_->set(get_cpu_usage_percentage());
+        }
+        
+        // Update memory usage
+        if (system_memory_usage_) {
+            system_memory_usage_->set(static_cast<double>(get_memory_usage_bytes()));
+        }
+        
+        // Update thread pool metrics
+        if (thread_pool_active_threads_) {
+            thread_pool_active_threads_->set(static_cast<double>(thread_pool_.active_threads()));
+        }
+        
+        if (thread_pool_queue_size_) {
+            thread_pool_queue_size_->set(static_cast<double>(thread_pool_.pending_tasks()));
+        }
+        
+        // Update NATS connection status
+        if (active_connections_) {
+            active_connections_->set(conn_ ? 1.0 : 0.0);
+        }
+        
+        // Update cache metrics if cache is enabled
+        if (cache_size_ && cache_) {
+            // Note: This would need cache_->size() method to be implemented
+            // cache_size_->set(static_cast<double>(cache_->size()));
+        }
+        
+    } catch (const std::exception& e) {
+        logger_->trace("Failed to update system metrics: {}", e.what());
+    }
+}
+
+std::string ServiceHost::get_metrics_output() {
+    try {
+        // Add service info as a metric
+        std::stringstream ss;
+        ss << "# HELP servicehost_info Information about the service\n";
+        ss << "# TYPE servicehost_info gauge\n";
+        ss << "servicehost_info{service=\"" << service_name_ << "\",instance=\"" << uid_ << "\",version=\"1.0.0\"} 1\n";
+        ss << "\n";
+        
+        // Get all metrics from registry
+        ss << PrometheusMetrics::MetricsRegistry::instance().serialize_all();
+        
+        return ss.str();
+    } catch (const std::exception& e) {
+        logger_->error("Failed to generate metrics output: {}", e.what());
+        return "# Error generating metrics\n";
+    }
+}
+
+int ServiceHost::get_metrics_port() const {
+    return metrics_server_ ? 8080 : 0;  // Default port or 0 if not running
 }
 
 size_t ServiceHost::get_current_queue_size() {
