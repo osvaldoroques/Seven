@@ -25,10 +25,10 @@ std::shared_ptr<trace_api::Tracer> OpenTelemetryIntegration::tracer_ = nullptr;
 bool OpenTelemetryIntegration::initialized_ = false;
 #endif
 
-void OpenTelemetryIntegration::initialize(const std::string& service_name, const std::string& otlp_endpoint) {
+bool OpenTelemetryIntegration::initialize(const std::string& service_name, const std::string& otlp_endpoint) {
 #ifdef HAVE_OPENTELEMETRY
     if (initialized_) {
-        return;
+        return true;
     }
 
     try {
@@ -61,13 +61,16 @@ void OpenTelemetryIntegration::initialize(const std::string& service_name, const
         propagator_ = std::make_unique<trace_propagation::HttpTraceContext>();
 
         initialized_ = true;
-        std::cout << "✅ OpenTelemetry initialized for service: " << service_name 
-                  << " endpoint: " << otlp_endpoint << std::endl;
+        std::cout << "✅ OpenTelemetry initialized: " << service_name 
+                  << " -> " << otlp_endpoint << std::endl;
+        return true;
     } catch (const std::exception& e) {
         std::cerr << "❌ Failed to initialize OpenTelemetry: " << e.what() << std::endl;
+        return false;
     }
 #else
     std::cout << "⚠️  OpenTelemetry not available (compiled without HAVE_OPENTELEMETRY)" << std::endl;
+    return false;
 #endif
 }
 

@@ -1,0 +1,3 @@
+repository='https://github.com/TartanLlama/lru_cache.git'
+module=''
+tag='origin'

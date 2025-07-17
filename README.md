@@ -50,6 +50,22 @@ A production-ready, high-performance microservices framework built with C++17, N
 - **No If-Statements** - Function pointers eliminate branching in critical paths
 - **Runtime Control** - Switch modes dynamically without recompilation
 
+### ✅ Production-Grade Caching System 🆕
+- **In-Memory LRU Cache** - O(1) get/put/erase operations with automatic eviction
+- **TTL Support** - Configurable time-to-live for automatic expiration
+- **Thread-Safe** - Concurrent access with minimal locking overhead
+- **ServiceHost Integration** - Available to all services through unified API
+- **Statistics Tracking** - Hit rates, evictions, and performance metrics
+- **Multiple Cache Instances** - Type-safe caches for different data types
+
+### ✅ Lightweight Task Scheduler 🆕
+- **In-Process Scheduling** - No external dependencies or processes
+- **Cron-like Intervals** - Schedule tasks by seconds, minutes, or hours
+- **Conditional Execution** - Tasks that run only when conditions are met
+- **One-Time Tasks** - Execute once after a delay, then auto-cleanup
+- **ThreadPool Integration** - Uses existing thread pool, no blocking
+- **Built-in Patterns** - Metrics flush, cache cleanup, health heartbeats, backpressure monitoring
+
 ### ✅ Production Observability Stack
 - **OpenTelemetry Integration** - Full C++ SDK with OTLP gRPC exporter
 - **Distributed Tracing** - W3C Trace-Context propagation across services
@@ -234,6 +250,11 @@ Seven/
 │   ├── logger.hpp                 # 🆕 Structured logging with correlation IDs & OpenTelemetry
 │   ├── opentelemetry_integration.hpp # 🆕 OpenTelemetry C++ SDK wrapper
 │   ├── opentelemetry_integration.cpp # 🆕 OTLP exporter & W3C trace context
+│   ├── service_cache.hpp          # 🆕 Production-grade LRU caching system
+│   ├── service_cache.cpp          # 🆕 Thread-safe cache implementation
+│   ├── seven_lru_cache.hpp        # 🆕 High-performance LRU cache (header-only)
+│   ├── service_scheduler.hpp      # 🆕 Lightweight task scheduler
+│   ├── service_scheduler.cpp      # 🆕 Cron-like scheduling implementation
 │   ├── thread_pool.hpp            # Configurable parallel processing
 │   ├── configuration.hpp          # Full YAML configuration (requires yaml-cpp)
 │   ├── configuration_simple.hpp   # Fallback configuration (no dependencies)
@@ -305,6 +326,80 @@ Logger::info("Processing request", {
 });
 
 // Output: {"timestamp":"2024-01-15T10:30:45.123Z","level":"info","message":"Processing request","trace_id":"a1b2c3d4e5f6789a","span_id":"1a2b3c4d","user_id":"user123","portfolio_size":5}
+```
+
+### Production-Grade Caching System 🆕
+```cpp
+#include "service_host.hpp"
+
+// Access integrated cache system
+ServiceHost host("service-1", "portfolio-manager");
+
+// Create typed cache for user portfolios
+auto portfolio_cache = host.create_cache<std::string, Portfolio>(
+    "user_portfolios",     // Cache name
+    1000,                  // Max size
+    std::chrono::hours(1)  // TTL
+);
+
+// Store and retrieve cached data
+portfolio_cache->put("user_123", user_portfolio);
+auto cached_portfolio = portfolio_cache->get("user_123");
+
+if (cached_portfolio.has_value()) {
+    // Cache hit - use cached data
+    process_portfolio(cached_portfolio.value());
+} else {
+    // Cache miss - fetch from database
+    auto portfolio = fetch_from_database("user_123");
+    portfolio_cache->put("user_123", portfolio);
+    process_portfolio(portfolio);
+}
+
+// Monitor cache performance
+auto stats = portfolio_cache->get_stats();
+logger->info("Cache hit rate: {:.2f}%", stats.hit_rate * 100);
+```
+
+### Lightweight Task Scheduler 🆕
+```cpp
+#include "service_host.hpp"
+
+ServiceHost host("service-1", "portfolio-manager");
+
+// Schedule metrics flush every 30 seconds
+host.schedule_metrics_flush([&host]() {
+    collect_and_send_metrics();
+});
+
+// Schedule cache cleanup every 5 minutes
+host.schedule_cache_cleanup([&host]() {
+    host.get_cache().cleanup_expired();
+});
+
+// Schedule health heartbeat every 10 seconds
+host.schedule_health_heartbeat([&host]() {
+    publish_health_status();
+});
+
+// Schedule backpressure monitoring
+host.schedule_backpressure_monitor(
+    [&host]() -> size_t { return host.get_thread_pool().pending_tasks(); },
+    100,  // Alert threshold
+    [&host]() { handle_high_queue_size(); }
+);
+
+// Custom scheduled task
+auto task_id = host.schedule_interval("cleanup_old_data", 
+                                     std::chrono::hours(1), 
+                                     [&host]() {
+    cleanup_old_data();
+});
+
+// Task management
+host.get_scheduler().disable_task(task_id);  // Pause task
+host.get_scheduler().enable_task(task_id);   // Resume task
+host.get_scheduler().cancel_task(task_id);   // Remove task
 ```
 
 ### OpenTelemetry Integration
@@ -448,6 +543,10 @@ libabsl-dev libre2-dev libgrpc++-dev libprotobuf-dev
 - [x] **🆕 Structured Logging** - JSON logs with trace_id/span_id correlation
 - [x] **🆕 Jaeger Integration** - Visual trace analysis and debugging
 - [x] **🆕 OTEL Collector** - Centralized telemetry processing pipeline
+- [x] **🆕 LRU Caching System** - Production-grade in-memory cache with TTL
+- [x] **🆕 Task Scheduler** - Lightweight cron-like scheduling for maintenance tasks
+- [x] **🆕 Cache Statistics** - Hit rates, evictions, and performance monitoring
+- [x] **🆕 Automatic Cleanup** - Scheduled cache maintenance and expired data removal
 
 ### 🔄 Active Development
 - [ ] **Performance benchmarking** with OpenTelemetry metrics
@@ -471,24 +570,48 @@ libabsl-dev libre2-dev libgrpc++-dev libprotobuf-dev
    - Daily log rotation with configurable retention
    - Environment-based log level control
 
-3. **📊 Service Monitoring**
+3. **🧠 Intelligent Caching**
+   - **LRU eviction** with O(1) performance
+   - **TTL expiration** for automatic cleanup
+   - **Thread-safe** concurrent access
+   - **Hit rate monitoring** and performance stats
+   - **Multiple cache types** (string→object, int→data, etc.)
+   - **ServiceHost integration** - available to all services
+
+4. **⏰ Automated Task Scheduling**
+   - **Metrics flush** every 30 seconds
+   - **Cache cleanup** every 5 minutes
+   - **Health heartbeats** every 10 seconds
+   - **Backpressure monitoring** with configurable thresholds
+   - **Custom intervals** - hours, minutes, seconds
+   - **One-time tasks** with automatic cleanup
+   - **Conditional execution** - run only when needed
+
+5. **📊 Service Monitoring**
    - OTEL Collector health metrics at :8888/metrics
    - Container health checks and restart policies
    - Resource usage monitoring via Docker stats
    - Service dependency health verification
+   - Cache performance analytics
+   - Task execution statistics
 
-4. **🚀 Production Ready**
+6. **🚀 Production Ready**
    - Zero-downtime deployments with health checks
    - Graceful shutdown with trace completion
    - Environment-based configuration override
    - Multi-stage Docker builds for optimal image size
+   - Automatic cache expiration and cleanup
+   - Scheduled maintenance tasks
 
 ## 🎯 Next Development Priorities
 
 1. **Custom Metrics Integration** - Add business metrics export via OpenTelemetry
 2. **Message Tracing** - Implement W3C trace context in NATS message headers
-3. **Performance Analytics** - Service latency and throughput dashboards
-4. **Alerting Setup** - Integration with Prometheus/Grafana for production monitoring
+3. **Distributed Cache** - Add Redis support for cross-service caching
+4. **Advanced Scheduling** - Cron expression support using croncpp library
+5. **Cache Warming** - Predictive cache population for improved performance
+6. **Alerting Setup** - Integration with Prometheus/Grafana for production monitoring
+7. **Performance Analytics** - Service latency and throughput dashboards with cache metrics
 
 ---
 
@@ -510,6 +633,12 @@ $BROWSER http://localhost:16686
 
 # Check collector health
 curl http://localhost:8888/metrics
+
+# Monitor cache performance (in application logs)
+docker compose logs -f portfolio_manager | grep -E "(cache|Cache)"
+
+# Check scheduled task execution
+docker compose logs -f portfolio_manager | grep -E "(Executing scheduled task|Task completed)"
 
 # Stop everything
 docker compose down

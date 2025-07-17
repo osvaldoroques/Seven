@@ -94,6 +94,12 @@ find_package(PkgConfig REQUIRED)
 # Find required dependencies (with fallback support for development)
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
+
+# Add header-only LRU cache library
+include(FetchContent)
+# Note: Using internal LRU cache implementation instead of external dependency
+# This provides better control and avoids build issues with external repositories
+
 message(STATUS "spdlog and fmt found - structured logging enabled")
 
 # Find yaml-cpp (now required)

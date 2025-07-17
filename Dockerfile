@@ -184,9 +184,50 @@ ENV ASAN_OPTIONS="verbosity=1:abort_on_error=1:check_initialization_order=1:dete
 ENV UBSAN_OPTIONS="print_stacktrace=1:abort_on_error=1"
 ENV TSAN_OPTIONS="verbosity=1:abort_on_error=1:halt_on_error=1"
 
-# Copy development build
+# Development healthcheck (more verbose)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \
+    CMD ps aux | grep portfolio_manager | grep -v grep || exit 1
+
+CMD ["./build/services/portfolio_manager/portfolio_manager", "config.yaml"]
+
+# Debug runtime stage for portfolio_manager (separate stage for debugging)
+FROM ubuntu:22.04 AS portfolio_manager_debug
+
+# Install runtime dependencies including debug tools
+RUN apt-get update && apt-get install -y \
+    libstdc++6 \
+    libprotobuf-dev \
+    libyaml-cpp-dev \
+    libspdlog-dev \
+    libfmt-dev \
+    libssl-dev \
+    zlib1g-dev \
+    libgrpc++-dev \
+    libcurl4-openssl-dev \
+    gdb \
+    valgrind \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy NATS shared libraries from builder stage
+COPY --from=builder /usr/local/lib/libnats* /usr/local/lib/
+COPY --from=builder /usr/local/include/nats /usr/local/include/nats/
+
+# Copy OpenTelemetry shared libraries from builder stage
+COPY --from=builder /usr/local/lib/libopentelemetry* /usr/local/lib/
+COPY --from=builder /usr/local/include/opentelemetry /usr/local/include/opentelemetry/
+RUN ldconfig
+
+WORKDIR /app
+
+# Copy development build with debug symbols
 COPY --from=development /app/build/services/portfolio_manager/portfolio_manager ./portfolio_manager_debug
 COPY --from=development /app/config.yaml .
+
+# Set up sanitizer environment
+ENV ASAN_OPTIONS="verbosity=1:abort_on_error=1:check_initialization_order=1:detect_leaks=1"
+ENV UBSAN_OPTIONS="print_stacktrace=1:abort_on_error=1"
+ENV TSAN_OPTIONS="verbosity=1:abort_on_error=1:halt_on_error=1"
 
 # Development healthcheck (more verbose)
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \

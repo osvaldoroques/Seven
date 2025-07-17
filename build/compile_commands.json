@@ -1,27 +1,37 @@
 [
 {
   "directory": "/workspaces/Seven/build",
-  "command": "/usr/bin/c++ -I/workspaces/Seven/build -fPIC -std=gnu++17 -o CMakeFiles/proto_files.dir/messages.pb.cc.o -c /workspaces/Seven/build/messages.pb.cc",
+  "command": "/usr/bin/c++ -I/workspaces/Seven/build -g -fPIC -std=gnu++17 -o CMakeFiles/proto_files.dir/messages.pb.cc.o -c /workspaces/Seven/build/messages.pb.cc",
   "file": "/workspaces/Seven/build/messages.pb.cc"
 },
 {
   "directory": "/workspaces/Seven/build",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o -c /workspaces/Seven/libs/common/service_host_impl.cpp",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -g -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/service_host_impl.cpp.o -c /workspaces/Seven/libs/common/service_host_impl.cpp",
   "file": "/workspaces/Seven/libs/common/service_host_impl.cpp"
 },
 {
   "directory": "/workspaces/Seven/build",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/logger.cpp.o -c /workspaces/Seven/libs/common/logger.cpp",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -g -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/service_cache.cpp.o -c /workspaces/Seven/libs/common/service_cache.cpp",
+  "file": "/workspaces/Seven/libs/common/service_cache.cpp"
+},
+{
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -g -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/service_scheduler.cpp.o -c /workspaces/Seven/libs/common/service_scheduler.cpp",
+  "file": "/workspaces/Seven/libs/common/service_scheduler.cpp"
+},
+{
+  "directory": "/workspaces/Seven/build",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -g -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/logger.cpp.o -c /workspaces/Seven/libs/common/logger.cpp",
   "file": "/workspaces/Seven/libs/common/logger.cpp"
 },
 {
   "directory": "/workspaces/Seven/build",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o -c /workspaces/Seven/libs/common/opentelemetry_integration.cpp",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -g -fPIC -std=gnu++17 -o libs/common/CMakeFiles/common.dir/opentelemetry_integration.cpp.o -c /workspaces/Seven/libs/common/opentelemetry_integration.cpp",
   "file": "/workspaces/Seven/libs/common/opentelemetry_integration.cpp"
 },
 {
   "directory": "/workspaces/Seven/build",
-  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -fPIE -std=gnu++17 -o services/portfolio_manager/CMakeFiles/portfolio_manager.dir/main.cpp.o -c /workspaces/Seven/services/portfolio_manager/main.cpp",
+  "command": "/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/services/portfolio_manager -I/workspaces/Seven/build -g -fPIE -std=gnu++17 -o services/portfolio_manager/CMakeFiles/portfolio_manager.dir/main.cpp.o -c /workspaces/Seven/services/portfolio_manager/main.cpp",
   "file": "/workspaces/Seven/services/portfolio_manager/main.cpp"
 }
 ]

@@ -11,6 +11,7 @@
 #include <csignal>
 #include <chrono>
 #include <sstream>
+#include <future>         // For std::future, std::promise, std::async
 
 #include <nats/nats.h>
 #include <google/protobuf/message.h>
@@ -19,6 +20,66 @@
 #include "logger.hpp"
 #include "opentelemetry_integration.hpp"
 #include "configuration.hpp"
+#include "service_cache.hpp"
+#include "service_scheduler.hpp"
+
+// Forward declaration
+class ServiceCache;
+class ServiceScheduler;
+
+// Service initialization configuration
+struct ServiceInitConfig {
+    // NATS Configuration
+    std::string nats_url = "nats://localhost:4222";
+    bool enable_jetstream = true;
+    
+    // Cache Configuration
+    bool enable_cache = true;
+    size_t default_cache_size = 1000;
+    std::chrono::seconds default_cache_ttl = std::chrono::hours(1);
+    
+    // Scheduler Configuration
+    bool enable_scheduler = true;
+    bool enable_auto_cache_cleanup = true;
+    std::chrono::minutes cache_cleanup_interval = std::chrono::minutes(5);
+    
+    // Monitoring & Metrics
+    bool enable_metrics_flush = false;
+    std::chrono::seconds metrics_flush_interval = std::chrono::seconds(30);
+    std::function<void()> metrics_flush_callback = nullptr;
+    
+    // Health Check Configuration
+    bool enable_health_heartbeat = false;
+    std::chrono::seconds health_heartbeat_interval = std::chrono::seconds(10);
+    std::function<void()> health_heartbeat_callback = nullptr;
+    
+    // Back-pressure Monitoring
+    bool enable_backpressure_monitor = false;
+    size_t backpressure_threshold = 100;
+    std::function<size_t()> queue_size_func = nullptr;
+    std::function<void()> backpressure_callback = nullptr;
+    
+    // Performance Configuration
+    bool enable_performance_mode = false;  // If true, starts with tracing disabled
+    
+    // OpenTelemetry Configuration
+    bool force_otel_initialization = false;
+    std::string custom_otel_endpoint = "";
+    
+    // 🚀 NEW: Permanent Service Maintenance Tasks
+    bool enable_permanent_tasks = true;  // Enable automatic service maintenance
+    std::chrono::seconds permanent_task_interval = std::chrono::seconds(30);  // How often to run maintenance
+    
+    // Individual task controls
+    bool enable_automatic_metrics_flush = true;   // Auto flush metrics when tracing enabled
+    bool enable_automatic_health_status = true;   // Auto send health status
+    bool enable_automatic_backpressure_check = true;  // Auto check for backpressure
+    
+    // Thresholds and limits
+    size_t automatic_backpressure_threshold = 100;  // Queue size threshold for backpressure
+    double health_check_cpu_threshold = 0.8;        // CPU threshold for health warnings
+    size_t health_check_memory_threshold = 1024 * 1024 * 1024;  // 1GB memory threshold
+};
 
 enum class MessageRouting
 {
@@ -39,38 +100,20 @@ public:
           logger_(std::make_shared<Logger>(service_name_, uid)),
           tracing_enabled_(false),
           publish_broadcast_impl_(&ServiceHost::publish_broadcast_fast),
-          publish_point_to_point_impl_(&ServiceHost::publish_point_to_point_fast)
+          publish_point_to_point_impl_(&ServiceHost::publish_point_to_point_fast),
+          cache_(std::make_unique<ServiceCache>(this)),
+          scheduler_(std::make_unique<ServiceScheduler>(&thread_pool_, logger_))
     {
-        // Initialize logging system
+        // Initialize logging system (safe, minimal)
         Logger::set_level_from_env();
         Logger::setup_signal_handler();
 
-        logger_->info("Initializing ServiceHost - UID: {}, Service: {}", uid_, service_name_);
+        logger_->info("ServiceHost constructor - UID: {}, Service: {}", uid_, service_name_);
 
-        // Initialize OpenTelemetry
-        const char *otlp_endpoint = std::getenv("OTEL_EXPORTER_OTLP_ENDPOINT");
-        if (otlp_endpoint)
-        {
-            OpenTelemetryIntegration::initialize(service_name_, otlp_endpoint);
-            logger_->info("OpenTelemetry initialized with endpoint: {}", otlp_endpoint);
-        }
-        else
-        {
-            logger_->warn("OTEL_EXPORTER_OTLP_ENDPOINT not set, skipping OpenTelemetry initialization");
-        }
-
-        // Fold-expression: call Register on each
+        // Fold-expression: call Register on each (safe, just registration)
         (std::forward<Regs>(regs).Register(this), ...);
 
-        // Start configuration file watching
-        config_.startWatch();
-        config_.onReload([this]()
-                         { logger_->info("Configuration reloaded"); });
-
-        // Setup signal handlers for graceful shutdown
-        setup_signal_handlers();
-
-        logger_->info("ServiceHost initialized with {} worker threads",
+        logger_->info("ServiceHost constructor completed - {} worker threads configured",
                       config_.get<size_t>("threads", std::thread::hardware_concurrency()));
     }
 
@@ -85,20 +128,21 @@ public:
           thread_pool_(thread_pool_size),
           tracing_enabled_(false),
           publish_broadcast_impl_(&ServiceHost::publish_broadcast_fast),
-          publish_point_to_point_impl_(&ServiceHost::publish_point_to_point_fast)
+          publish_point_to_point_impl_(&ServiceHost::publish_point_to_point_fast),
+          cache_(std::make_unique<ServiceCache>(this)),
+          scheduler_(std::make_unique<ServiceScheduler>(&thread_pool_, logger_))
     {
-        // Fold-expression: call Register on each
+        // Initialize logging system (safe, minimal)
+        Logger::set_level_from_env();
+        Logger::setup_signal_handler();
+
+        logger_->info("ServiceHost constructor - UID: {}, Service: {}, Threads: {}", 
+                      uid_, service_name_, thread_pool_size);
+
+        // Fold-expression: call Register on each (safe, just registration)
         (std::forward<Regs>(regs).Register(this), ...);
 
-        config_.startWatch();
-        config_.onReload([this]()
-                         { std::cout << "🔄 Configuration reloaded" << std::endl; });
-
-        // Setup signal handlers for graceful shutdown
-        setup_signal_handlers();
-
-        std::cout << "✅ ServiceHost initialized with " << thread_pool_size
-                  << " worker threads" << std::endl;
+        logger_->info("ServiceHost constructor completed with {} worker threads", thread_pool_size);
     }
 
     // Constructor with custom config file
@@ -113,26 +157,21 @@ public:
           logger_(std::make_shared<Logger>(service_name_, uid)),
           tracing_enabled_(false),
           publish_broadcast_impl_(&ServiceHost::publish_broadcast_fast),
-          publish_point_to_point_impl_(&ServiceHost::publish_point_to_point_fast)
+          publish_point_to_point_impl_(&ServiceHost::publish_point_to_point_fast),
+          cache_(std::make_unique<ServiceCache>(this)),
+          scheduler_(std::make_unique<ServiceScheduler>(&thread_pool_, logger_))
     {
-        // Initialize logging system
+        // Initialize logging system (safe, minimal)
         Logger::set_level_from_env();
         Logger::setup_signal_handler();
 
-        logger_->info("Initializing ServiceHost with custom config - UID: {}, Service: {}, Config: {}",
+        logger_->info("ServiceHost constructor - UID: {}, Service: {}, Config: {}", 
                       uid_, service_name_, config_file);
 
-        // Fold-expression: call Register on each
+        // Fold-expression: call Register on each (safe, just registration)
         (std::forward<Regs>(regs).Register(this), ...);
 
-        config_.startWatch();
-        config_.onReload([this]()
-                         { logger_->info("Configuration reloaded"); });
-
-        // Setup signal handlers for graceful shutdown
-        setup_signal_handlers();
-
-        logger_->info("ServiceHost initialized with config from {}", config_file);
+        logger_->info("ServiceHost constructor completed with config from {}", config_file);
     }
     virtual ~ServiceHost();
 
@@ -146,6 +185,30 @@ public:
         return logger_->create_request_logger();
     }
 
+    // Thread pool access
+    ThreadPool& get_thread_pool() { return thread_pool_; }
+    const ThreadPool& get_thread_pool() const { return thread_pool_; }
+
+    // 🚀 NEW: Simplified Handler Registration System
+    // Handler takes raw payload; your logic will parse it
+    using HandlerRaw = std::function<void(const std::string& payload)>;
+
+    // Map: message type name → (routing, handler)
+    using RegistrationMap = std::unordered_map<std::string, std::pair<MessageRouting, HandlerRaw>>;
+
+    // Batch-register handlers from a map
+    void register_handlers(const RegistrationMap& regs);
+
+    // Individual handler registration (alternative to map-based)
+    void register_handler(const std::string& message_type, 
+                         MessageRouting routing, 
+                         HandlerRaw handler);
+
+protected:
+    // Protected access for derived classes
+    natsConnection* get_nats_connection() { return conn_; }
+    
+public:
     // Graceful shutdown functionality
     void shutdown();
     void setup_signal_handlers();
@@ -160,6 +223,163 @@ public:
     T get_config(const std::string &key, T default_value) const
     {
         return config_.get<T>(key, default_value);
+    }
+
+    // Cache access - Core feature for all services
+    ServiceCache& get_cache() { return *cache_; }
+    const ServiceCache& get_cache() const { return *cache_; }
+    
+    // Convenience methods for common cache operations
+    template<typename Key, typename Value>
+    auto create_cache(const std::string& name, size_t max_size, 
+                     std::chrono::seconds ttl = std::chrono::seconds(0))
+    {
+        return cache_->template create_cache<Key, Value>(name, max_size, ttl);
+    }
+    
+    template<typename Key, typename Value>
+    auto get_cache_instance(const std::string& name)
+    {
+        return cache_->template get_cache_instance<Key, Value>(name);
+    }
+
+    // Scheduler access - Built-in task scheduling for all services
+    ServiceScheduler& get_scheduler() { return *scheduler_; }
+    const ServiceScheduler& get_scheduler() const { return *scheduler_; }
+    
+    // Convenience methods for common scheduling patterns
+    using TaskId = ServiceScheduler::TaskId;
+    
+    // Schedule metrics flush every 30 seconds
+    TaskId schedule_metrics_flush(std::function<void()> flush_func) {
+        return scheduler_->schedule_metrics_flush(std::move(flush_func));
+    }
+    
+    // Schedule cache cleanup every 5 minutes
+    TaskId schedule_cache_cleanup(std::function<void()> cleanup_func) {
+        return scheduler_->schedule_cache_cleanup(std::move(cleanup_func));
+    }
+    
+    // Schedule health check heartbeat every 10 seconds
+    TaskId schedule_health_heartbeat(std::function<void()> heartbeat_func) {
+        return scheduler_->schedule_health_heartbeat(std::move(heartbeat_func));
+    }
+    
+    // Schedule back-pressure monitoring
+    TaskId schedule_backpressure_monitor(std::function<size_t()> queue_size_func,
+                                        size_t threshold,
+                                        std::function<void()> alert_func) {
+        return scheduler_->schedule_backpressure_monitor(std::move(queue_size_func), 
+                                                        threshold, std::move(alert_func));
+    }
+    
+    // General scheduling methods
+    TaskId schedule_interval(const std::string& name, 
+                           std::chrono::milliseconds interval,
+                           std::function<void()> task) {
+        return scheduler_->schedule_interval(name, interval, std::move(task));
+    }
+    
+    TaskId schedule_once(const std::string& name,
+                        std::chrono::milliseconds delay,
+                        std::function<void()> task) {
+        return scheduler_->schedule_once(name, delay, std::move(task));
+    }
+
+    // 🚀 COMPREHENSIVE SERVICE INITIALIZATION 🚀
+    // One-stop initialization for all service functionalities
+    void initialize_service(const ServiceInitConfig& config = {});
+    
+    // 🚀 NEW: StartService - Complete service startup with configuration
+    // This method handles all service initialization and startup in one call
+    void StartService(const ServiceInitConfig& config = {});
+    
+    // 🚀 NEW: StartServiceAsync - Non-blocking service startup
+    // Returns a future that completes when service infrastructure is ready
+    std::future<void> StartServiceAsync(const ServiceInitConfig& config = {});
+    
+    // 🚀 NEW: StartServiceInfrastructureAsync - Initialize just the infrastructure
+    // Returns a future for NATS, JetStream, and core systems initialization
+    std::future<void> StartServiceInfrastructureAsync(const ServiceInitConfig& config = {});
+    
+    // 🚀 NEW: CompleteServiceStartup - Complete startup after async infrastructure init
+    // Call this after infrastructure future is ready to finish service setup
+    std::future<void> CompleteServiceStartup(const ServiceInitConfig& config = {});
+    
+    // 🚀 NEW: Permanent Service Maintenance Tasks
+    // Start automatic service maintenance tasks (metrics, health, backpressure)
+    void StartPermanentTasks(const ServiceInitConfig& config = {});
+    
+    // Stop permanent service maintenance tasks
+    void StopPermanentTasks();
+    
+    // Check if permanent tasks are running
+    bool IsPermanentTasksRunning() const { return permanent_tasks_running_.load(); }
+    
+    // Start subscription processing for registered message handlers
+    void start_subscription_processing();
+    
+    // Create a default service initialization config
+    static ServiceInitConfig create_default_config() {
+        return ServiceInitConfig{};
+    }
+    
+    // Create a production service config with common settings
+    static ServiceInitConfig create_production_config() {
+        ServiceInitConfig config;
+        config.enable_cache = true;
+        config.default_cache_size = 5000;
+        config.default_cache_ttl = std::chrono::hours(2);
+        config.enable_metrics_flush = true;
+        config.enable_health_heartbeat = true;
+        config.enable_backpressure_monitor = true;
+        config.backpressure_threshold = 200;
+        
+        // Enable permanent service maintenance tasks
+        config.enable_permanent_tasks = true;
+        config.permanent_task_interval = std::chrono::seconds(30);
+        config.enable_automatic_metrics_flush = true;
+        config.enable_automatic_health_status = true;
+        config.enable_automatic_backpressure_check = true;
+        config.automatic_backpressure_threshold = 200;
+        
+        return config;
+    }
+    
+    // Create a development service config with enhanced monitoring
+    static ServiceInitConfig create_development_config() {
+        ServiceInitConfig config;
+        config.enable_cache = true;
+        config.default_cache_size = 1000;
+        config.enable_metrics_flush = true;
+        config.enable_health_heartbeat = true;
+        config.enable_backpressure_monitor = true;
+        config.backpressure_threshold = 50;
+        config.enable_performance_mode = false;  // Full tracing in dev
+        
+        // Enable permanent service maintenance tasks with more frequent checks in dev
+        config.enable_permanent_tasks = true;
+        config.permanent_task_interval = std::chrono::seconds(15);
+        config.enable_automatic_metrics_flush = true;
+        config.enable_automatic_health_status = true;
+        config.enable_automatic_backpressure_check = true;
+        config.automatic_backpressure_threshold = 50;
+        
+        return config;
+    }
+    
+    // Create a high-performance service config
+    static ServiceInitConfig create_performance_config() {
+        ServiceInitConfig config;
+        config.enable_cache = true;
+        config.default_cache_size = 10000;
+        config.default_cache_ttl = std::chrono::minutes(30);
+        config.enable_performance_mode = true;  // Tracing disabled for speed
+        config.enable_metrics_flush = false;    // Minimal overhead
+        config.enable_health_heartbeat = false;
+        config.enable_backpressure_monitor = true;
+        config.backpressure_threshold = 500;
+        return config;
     }
 
     // Thread pool utilities
@@ -322,18 +542,19 @@ public:
         }
     }    void init_nats(const std::string &nats_url = "nats://localhost:4222");
     void init_jetstream();
+    void init_cache_system();
 
-    // 🚀 Hot-path methods with function pointer optimization
-    void publish_broadcast(const google::protobuf::Message &message);
-    void publish_point_to_point(const std::string &target_uid, const google::protobuf::Message &message);
-    
-    // Dynamic tracing control
+    // Enable/disable OpenTelemetry tracing (function pointer optimization)
     void enable_tracing();
     void disable_tracing();
     bool is_tracing_enabled() const { return tracing_enabled_; }
     
     // 🚀 Performance benchmarking and validation
     void run_performance_benchmark(int iterations = 10000, bool verbose = true);
+
+    // Optimized publish methods with function pointer dispatch
+    void publish_broadcast(const google::protobuf::Message &message);
+    void publish_point_to_point(const std::string &target_uid, const google::protobuf::Message &message);
 
     // Legacy V2 methods (kept for compatibility)
     void publish_broadcast_V2(const google::protobuf::Message &message);
@@ -361,6 +582,8 @@ private:
     ThreadPool thread_pool_;         // Thread pool for parallel message processing
     std::shared_ptr<Logger> logger_; // Structured logging with correlation IDs
     std::mutex publish_mutex_;       // Ensure thread-safe publishing
+    std::unique_ptr<ServiceCache> cache_; // Integrated LRU caching system
+    std::unique_ptr<ServiceScheduler> scheduler_; // Integrated task scheduler
 
     std::atomic<bool> running_{true}; // Flag for graceful shutdown
     
@@ -379,6 +602,26 @@ private:
     // Traced implementations (OpenTelemetry enabled)
     void publish_broadcast_traced(const google::protobuf::Message &message);
     void publish_point_to_point_traced(const std::string &target_uid, const google::protobuf::Message &message);
+    
+    // 🚀 NEW: Permanent Service Maintenance Task System
+    std::atomic<bool> permanent_tasks_running_{false};
+    TaskId permanent_task_id_{0};
+    ServiceInitConfig permanent_task_config_;
+    
+    // Permanent task execution methods
+    void start_permanent_tasks(const ServiceInitConfig& config);
+    void stop_permanent_tasks();
+    void execute_permanent_maintenance_cycle();
+    
+    // Individual maintenance task methods
+    void execute_metrics_flush_task();
+    void execute_health_status_task();
+    void execute_backpressure_check_task();
+    
+    // Helper methods for maintenance tasks
+    double get_cpu_usage_percentage();
+    size_t get_memory_usage_bytes();
+    size_t get_current_queue_size();
 
 public:
     static ServiceHost *instance_; // For signal handler access (public)

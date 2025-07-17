@@ -44,8 +44,9 @@ private:
 public:
     /**
      * Initialize OpenTelemetry with OTLP exporter
+     * @return true if initialization succeeded, false otherwise
      */
-    static void initialize(const std::string& service_name, const std::string& otlp_endpoint = "http://localhost:4317");
+    static bool initialize(const std::string& service_name, const std::string& otlp_endpoint = "http://localhost:4317");
 
     /**
      * Get the global tracer instance
@@ -96,6 +97,22 @@ public:
      * Shutdown OpenTelemetry
      */
     static void shutdown();
+
+    /**
+     * Check if OpenTelemetry is properly initialized
+     */
+    static bool is_initialized() { return initialized_; }
+
+    /**
+     * Check if OpenTelemetry is available at compile time
+     */
+    static bool is_available() { 
+#ifdef HAVE_OPENTELEMETRY
+        return true;
+#else
+        return false;
+#endif
+    }
 
 private:
 #ifdef HAVE_OPENTELEMETRY

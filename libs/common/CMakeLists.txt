@@ -1,5 +1,7 @@
 add_library(common STATIC
     service_host_impl.cpp
+    service_cache.cpp
+    service_scheduler.cpp
     logger.cpp
     opentelemetry_integration.cpp
 )

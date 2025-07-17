@@ -1,0 +1,56 @@
+[1/5] Building CXX object services/portfolio_manager/CMakeFiles/portfolio_manager_composition.dir/main_composition.cpp.o
+FAILED: services/portfolio_manager/CMakeFiles/portfolio_manager_composition.dir/main_composition.cpp.o 
+/usr/bin/c++ -DFMT_LOCALE -DFMT_SHARED -DOTEL_STUBS -DSPDLOG_COMPILED_LIB -DSPDLOG_FMT_EXTERNAL -DSPDLOG_SHARED_LIB -I/workspaces/Seven/libs/common -I/workspaces/Seven/build -g -fPIE -std=gnu++17 -MD -MT services/portfolio_manager/CMakeFiles/portfolio_manager_composition.dir/main_composition.cpp.o -MF services/portfolio_manager/CMakeFiles/portfolio_manager_composition.dir/main_composition.cpp.o.d -o services/portfolio_manager/CMakeFiles/portfolio_manager_composition.dir/main_composition.cpp.o -c /workspaces/Seven/services/portfolio_manager/main_composition.cpp
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp: In function 'int main(int, char**)':
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:53:27: error: 'class PortfolioManager' has no member named 'initialize_for_development'
+   53 |         portfolio_service.initialize_for_development(nats_url);
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:55:27: error: 'class PortfolioManager' has no member named 'initialize_for_high_performance'
+   55 |         portfolio_service.initialize_for_high_performance(nats_url);
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:58:27: error: 'class PortfolioManager' has no member named 'initialize_portfolio_service'
+   58 |         portfolio_service.initialize_portfolio_service(nats_url);
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:92:31: error: 'class PortfolioManager' has no member named 'get_uid'
+   92 |             portfolio_service.get_uid();
+      |                               ^~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:112:37: error: 'class PortfolioManager' has no member named 'get_logger'
+  112 |     auto logger = portfolio_service.get_logger();
+      |                                     ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:118:65: error: 'class PortfolioManager' has no member named 'get_config'
+  118 |     logger->info("   • Thread Pool Size: {}", portfolio_service.get_config<int>("thread_pool.size", 4));
+      |                                                                 ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:118:76: error: expected primary-expression before 'int'
+  118 |     logger->info("   • Thread Pool Size: {}", portfolio_service.get_config<int>("thread_pool.size", 4));
+      |                                                                            ^~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:119:62: error: 'class PortfolioManager' has no member named 'get_config'
+  119 |     logger->info("   • Max Positions: {}", portfolio_service.get_config<int>("portfolio_manager.max_positions", 1000));
+      |                                                              ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:119:73: error: expected primary-expression before 'int'
+  119 |     logger->info("   • Max Positions: {}", portfolio_service.get_config<int>("portfolio_manager.max_positions", 1000));
+      |                                                                         ^~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:120:67: error: 'class PortfolioManager' has no member named 'get_config'
+  120 |     logger->info("   • Update Frequency: {}ms", portfolio_service.get_config<int>("portfolio_manager.update_frequency", 1000));
+      |                                                                   ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:120:78: error: expected primary-expression before 'int'
+  120 |     logger->info("   • Update Frequency: {}ms", portfolio_service.get_config<int>("portfolio_manager.update_frequency", 1000));
+      |                                                                              ^~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:121:73: error: 'class PortfolioManager' has no member named 'get_config'
+  121 |     logger->info("   • Default Portfolio Value: ${}", portfolio_service.get_config<double>("portfolio_manager.default_portfolio_value", 100000.0));
+      |                                                                         ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:121:84: error: expected primary-expression before 'double'
+  121 |     logger->info("   • Default Portfolio Value: ${}", portfolio_service.get_config<double>("portfolio_manager.default_portfolio_value", 100000.0));
+      |                                                                                    ^~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:122:67: error: 'class PortfolioManager' has no member named 'get_config'
+  122 |     logger->info("   • Shutdown Timeout: {}ms", portfolio_service.get_config<int>("shutdown.timeout", 5000));
+      |                                                                   ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:122:78: error: expected primary-expression before 'int'
+  122 |     logger->info("   • Shutdown Timeout: {}ms", portfolio_service.get_config<int>("shutdown.timeout", 5000));
+      |                                                                              ^~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:134:30: error: 'class PortfolioManager' has no member named 'is_running'
+  134 |     while (portfolio_service.is_running()) {
+      |                              ^~~~~~~~~~
+/workspaces/Seven/services/portfolio_manager/main_composition.cpp:139:23: error: 'class PortfolioManager' has no member named 'stop'
+  139 |     portfolio_service.stop();
+      |                       ^~~~
+ninja: build stopped: subcommand failed.

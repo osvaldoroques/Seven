@@ -25,7 +25,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=Debug
 
 //CXX compiler
 CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
@@ -202,11 +202,46 @@ Catch2_DIR:PATH=/usr/lib/cmake/Catch2
 //Maximum time allowed before CTest will kill the test.
 DART_TESTING_TIMEOUT:STRING=1500
 
+//Enable AddressSanitizer
+ENABLE_ASAN:BOOL=OFF
+
+//Enable MemorySanitizer
+ENABLE_MSAN:BOOL=OFF
+
 //Enable building tests
 ENABLE_TESTS:BOOL=OFF
 
+//Enable ThreadSanitizer
+ENABLE_TSAN:BOOL=OFF
+
+//Enable UndefinedBehaviorSanitizer
+ENABLE_UBSAN:BOOL=OFF
+
+//Directory under which to collect all populated content
+FETCHCONTENT_BASE_DIR:PATH=/workspaces/Seven/build/_deps
+
+//Disables all attempts to download or update content and assumes
+// source dirs already exist
+FETCHCONTENT_FULLY_DISCONNECTED:BOOL=OFF
+
+//Enables QUIET option for all content population
+FETCHCONTENT_QUIET:BOOL=ON
+
+//When not empty, overrides where to find pre-populated content
+// for tl_lru_cache
+FETCHCONTENT_SOURCE_DIR_TL_LRU_CACHE:PATH=
+
+//Enables UPDATE_DISCONNECTED behavior for all content population
+FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
+
+//Enables UPDATE_DISCONNECTED behavior just for population of tl_lru_cache
+FETCHCONTENT_UPDATES_DISCONNECTED_TL_LRU_CACHE:BOOL=OFF
+
 //Path to a program.
 GITCOMMAND:FILEPATH=/usr/bin/git
+
+//Git command line client
+GIT_EXECUTABLE:FILEPATH=/usr/bin/git
 
 //Command to build the project
 MAKECOMMAND:STRING=/usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
@@ -443,6 +478,8 @@ FIND_PACKAGE_MESSAGE_DETAILS_Protobuf:INTERNAL=[/usr/lib/x86_64-linux-gnu/libpro
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: GITCOMMAND
 GITCOMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: GIT_EXECUTABLE
+GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: MAKECOMMAND
 MAKECOMMAND-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: MEMORYCHECK_COMMAND
